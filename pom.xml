@@ -42,9 +42,9 @@
         <dep.jmh.version>1.9.3</dep.jmh.version>
         <junit.version>4.12</junit.version>
         <lambda.from.string.version>1.6</lambda.from.string.version>
-        <logback-classic-version>1.2.3</logback-classic-version>
-<!--        <jar-scope>compile</jar-scope>-->
-        <jar-scope>provided</jar-scope>
+        <logback-classic-version>1.2.4</logback-classic-version>
+        <jar-scope>compile</jar-scope>
+<!--        <jar-scope>provided</jar-scope>-->
     </properties>
 
     <dependencyManagement>
@@ -145,6 +145,12 @@
                 </exclusions>
             </dependency>
 
+            <!--ip地址转地区 https://github.com/lionsoul2014/ip2region-->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>1.7.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -260,6 +266,12 @@
             <artifactId>log4j-over-slf4j</artifactId>
             <version>1.7.15</version>
             <scope>${jar-scope}</scope>
+        </dependency>
+
+        <!--ip地址转地区 https://github.com/lionsoul2014/ip2region-->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
         </dependency>
     </dependencies>
 

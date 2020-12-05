@@ -49,6 +49,30 @@ public class ConfigUtils {
         return strings;
     }
 
+    public static byte[] loadBinFile(String fileName) throws IOException {
+        ArrayList<String> strings = Lists.newArrayList();
+        Closer closer = Closer.create();
+        try {
+            InputStream inputStream = ConfigUtils.class.getResourceAsStream(fileName);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
+            closer.register(bufferedReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (Strings.isNullOrEmpty(line) || line.startsWith("#")) {
+                    continue;
+                }
+                strings.add(line);
+            }
+        } catch (IOException e) {
+            logger.error("loadFile {} error. error is {}.", fileName, e);
+            throw e;
+        } finally {
+            closer.close();
+        }
+
+        return ;
+    }
+
     public static Map<String, ChinaIdArea> getIdCardMap() {
         String fileName = "/china_p_c_a.config";
         Map<String, ChinaIdArea> map = Maps.newHashMap();
