@@ -57,8 +57,10 @@ public class ConfigUtils {
         try {
             // 一次性载入，速度最快
             InputStream is = ConfigUtils.class.getResourceAsStream(fileName);
+            closer.register(is);
             bytes = new byte[is.available()];
             is.read(bytes);
+
 //            // 设置缓冲器大小, 4k
 //            final int buffSize = 4096;
 //            byte[] bf = new byte[buffSize];
