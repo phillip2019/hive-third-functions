@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.krb5.Config;
@@ -50,13 +52,13 @@ public class ConfigUtils {
     }
 
     public static byte[] loadBinFile(String fileName) throws IOException {
-        ArrayList<String> strings = Lists.newArrayList();
+        byte[] ipDBArr = null;
         Closer closer = Closer.create();
         try {
             InputStream inputStream = ConfigUtils.class.getResourceAsStream(fileName);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
             closer.register(bufferedReader);
-            String line;
+                String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (Strings.isNullOrEmpty(line) || line.startsWith("#")) {
                     continue;
