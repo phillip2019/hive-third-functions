@@ -6,13 +6,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.krb5.Config;
@@ -50,27 +51,33 @@ public class ConfigUtils {
     }
 
     public static byte[] loadBinFile(String fileName) throws IOException {
-        ArrayList<String> strings = Lists.newArrayList();
+//        ByteBuffer bbf = ByteBuffer.allocateDirect(8_733_094 + 1024);
+        byte[] bytes = null;
         Closer closer = Closer.create();
         try {
-            InputStream inputStream = ConfigUtils.class.getResourceAsStream(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
-            closer.register(bufferedReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (Strings.isNullOrEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                strings.add(line);
-            }
+            // 一次性载入，速度最快
+            InputStream is = ConfigUtils.class.getResourceAsStream(fileName);
+            bytes = new byte[is.available()];
+            is.read(bytes);
+//            // 设置缓冲器大小, 4k
+//            final int buffSize = 4096;
+//            byte[] bf = new byte[buffSize];
+//            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffSize);
+//            closer.register(bufferedInputStream);
+//            while (bufferedInputStream.read(bf) != -1) {
+//                bbf.put(bf);
+//            }
         } catch (IOException e) {
             logger.error("loadFile {} error. error is {}.", fileName, e);
             throw e;
         } finally {
             closer.close();
         }
-
-        return ;
+        // 转换模式
+//        bbf.flip();
+//        byte[] bytes = new byte[bbf.remaining()];
+//        bbf.get(bytes);
+        return bytes;
     }
 
     public static Map<String, ChinaIdArea> getIdCardMap() {
