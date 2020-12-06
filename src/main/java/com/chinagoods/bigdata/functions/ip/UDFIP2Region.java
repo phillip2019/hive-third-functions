@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.lionsoul.ip2region.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,8 @@ public class UDFIP2Region extends UDF {
     public static final Logger logger = LoggerFactory.getLogger(UDFIP2Region.class);
 
     public static DbConfig config;
-    public static final String IP2REGION_DB_PATH = "/ip2region.db";
+//    public static final String IP2REGION_DB_PATH = "/ip2region.db";
+    public static final String IP2REGION_DB_PATH = "/user/hive/warehouse/resource/ip2region.db";
     public static volatile byte[] IP2REGION_DB_BYTES;
     static {
         try {
@@ -35,7 +35,7 @@ public class UDFIP2Region extends UDF {
         }
     }
 
-    public static DbSearcher DB_SEARCHER = null;
+    public DbSearcher dbSearcher = null;
 
     public UDFIP2Region() {
     }
@@ -61,8 +61,8 @@ public class UDFIP2Region extends UDF {
                 logger.error("loading ip2region.db error", e);
                 throw new HiveException(e);
             }
-            DB_SEARCHER = new DbSearcher(config, IP2REGION_DB_BYTES);
-            logger.info("load ip2region.db success!!!");
+            dbSearcher = new DbSearcher(config, IP2REGION_DB_BYTES);
+            logger.info("load ip2region.db success, bytes length={}!!!", IP2REGION_DB_BYTES.length);
         }
 
         if (StringUtils.isBlank(ip) || StringUtils.equals("0000", ip)  ||
@@ -76,7 +76,7 @@ public class UDFIP2Region extends UDF {
         }
         DataBlock db = null;
         try {
-            db = DB_SEARCHER.memorySearch(ip);
+            db = dbSearcher.memorySearch(ip);
         } catch (IOException e) {
             logger.error("IO exception，details error：", e);
             throw new HiveException(e);
@@ -100,5 +100,11 @@ public class UDFIP2Region extends UDF {
             }
         }
         return ret;
+    }
+
+    public static void main(String[] args) throws HiveException {
+        UDFIP2Region udfip2Region = new UDFIP2Region();
+        System.out.println(udfip2Region.evaluate("39.183.144.171", 0));
+
     }
 }
