@@ -60,7 +60,8 @@ public class ConfigUtils {
 
     public static byte[] loadBinFile(String fileName) throws IOException {
 //        ByteBuffer bbf = ByteBuffer.allocateDirect(8_733_094 + 1024);
-        byte[] bytes = null;
+//        byte[] bytes = null;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         Closer closer = Closer.create();
         try {
 //            // 一次性载入，速度最快
@@ -73,8 +74,13 @@ public class ConfigUtils {
             Path remotePath = new Path(fileName);
             FSDataInputStream in = fs.open(remotePath);
             closer.register(in);
-            bytes = new byte[in.available()];
-            in.read(bytes);
+            byte[] buffer = new byte[4096];
+            int n = 0;
+            while (-1 != (n = in.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+//            bytes = new byte[in.available()];
+//            in.read(bytes);
 
 //            // 设置缓冲器大小, 4k
 //            final int buffSize = 4096;
@@ -94,7 +100,7 @@ public class ConfigUtils {
 //        bbf.flip();
 //        byte[] bytes = new byte[bbf.remaining()];
 //        bbf.get(bytes);
-        return bytes;
+        return output.toByteArray();
     }
 
     public static Map<String, ChinaIdArea> getIdCardMap() {
