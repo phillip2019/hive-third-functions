@@ -70,26 +70,28 @@ public class ConfigUtils {
 //            bytes = new byte[is.available()];
 //            is.read(bytes);
 
-            FileSystem fs = FileSystem.newInstance(getHDFSConf());
-            Path remotePath = new Path(fileName);
-            FSDataInputStream in = fs.open(remotePath);
+//            FileSystem fs = FileSystem.newInstance(getHDFSConf());
+//            Path remotePath = new Path(fileName);
+//            FSDataInputStream in = fs.open(remotePath);
+//            closer.register(in);
+//            byte[] buffer = new byte[4096];
+//            int n = 0;
+//            while (-1 != (n = in.read(buffer))) {
+//                output.write(buffer, 0, n);
+//            }
+//            bytes = new byte[in.available()];
+//            in.read(bytes);
+
+            // 设置缓冲器大小, 4k
+            final int buffSize = 4096;
+            byte[] bf = new byte[buffSize];
+            InputStream in = ConfigUtils.class.getResourceAsStream(fileName);
             closer.register(in);
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[buffSize];
             int n = 0;
             while (-1 != (n = in.read(buffer))) {
                 output.write(buffer, 0, n);
             }
-//            bytes = new byte[in.available()];
-//            in.read(bytes);
-
-//            // 设置缓冲器大小, 4k
-//            final int buffSize = 4096;
-//            byte[] bf = new byte[buffSize];
-//            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffSize);
-//            closer.register(bufferedInputStream);
-//            while (bufferedInputStream.read(bf) != -1) {
-//                bbf.put(bf);
-//            }
         } catch (IOException e) {
             logger.error("loadFile {} error. error is {}.", fileName, e);
             throw e;

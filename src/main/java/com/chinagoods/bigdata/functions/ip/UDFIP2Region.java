@@ -23,8 +23,8 @@ public class UDFIP2Region extends UDF {
     public static final Logger logger = LoggerFactory.getLogger(UDFIP2Region.class);
 
     public static DbConfig config;
-//    public static final String IP2REGION_DB_PATH = "/ip2region.db";
-    public static final String IP2REGION_DB_PATH = "/user/hive/warehouse/resource/ip2region.db";
+    public static final String IP2REGION_DB_PATH = "/ip2region.db";
+//    public static final String IP2REGION_DB_PATH = "/user/hive/warehouse/resource/ip2region.db";
     public static volatile byte[] IP2REGION_DB_BYTES;
     static {
         try {
@@ -62,18 +62,20 @@ public class UDFIP2Region extends UDF {
                 throw new HiveException(e);
             }
             dbSearcher = new DbSearcher(config, IP2REGION_DB_BYTES);
-            logger.info("load ip2region.db success, bytes length={}!!!", IP2REGION_DB_BYTES.length);
+            logger.info("load ip2region.db success, path={}, bytes length={}!!!", IP2REGION_DB_PATH, IP2REGION_DB_BYTES.length);
         }
-
+        logger.debug("ip: {}", ip);
         if (StringUtils.isBlank(ip) || StringUtils.equals("0000", ip)  ||
                 StringUtils.equals("-", ip)) {
             return null;
         }
-
+        logger.debug("ip is not empty: {}", ip);
         // 若是非合法ip地址，返回null
         if (!Util.isIpAddress(ip)) {
             return null;
         }
+
+        logger.debug("ip passed legality check, ip: {}", ip);
         DataBlock db = null;
         try {
             db = dbSearcher.memorySearch(ip);
@@ -85,6 +87,7 @@ public class UDFIP2Region extends UDF {
             logger.error("Not exists ip: {}", ip);
             return null;
         }
+        logger.debug("search ip:{} return DataBlock: {}.", ip, db);
         String region = db.getRegion();
         String[] arr = StringUtils.split(region, '|');
         String ret = region;
