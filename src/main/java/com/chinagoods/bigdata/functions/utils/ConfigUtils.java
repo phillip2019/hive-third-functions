@@ -6,18 +6,16 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.krb5.Config;
 
 /**
  * @author ruifeng.shan
@@ -26,6 +24,7 @@ import sun.security.krb5.Config;
  */
 public class ConfigUtils {
     private static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    public static Configuration conf = null;
 
     public static List<String> loadFile(String fileName) throws IOException {
         ArrayList<String> strings = Lists.newArrayList();
@@ -51,28 +50,51 @@ public class ConfigUtils {
         return strings;
     }
 
+    public static Configuration getHDFSConf(){
+        if (conf == null){
+            //这里的路径是在hdfs上的存放路径，但是事先需将hdfs-site.xml文件放在工程的source文件下，这样才能找到hdfs
+            conf = new Configuration();
+        }
+        return conf;
+    }
+
     public static byte[] loadBinFile(String fileName) throws IOException {
-        byte[] ipDBArr = null;
+//        ByteBuffer bbf = ByteBuffer.allocateDirect(8_733_094 + 1024);
+        byte[] bytes = null;
         Closer closer = Closer.create();
         try {
-            InputStream inputStream = ConfigUtils.class.getResourceAsStream(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
-            closer.register(bufferedReader);
-                String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (Strings.isNullOrEmpty(line) || line.startsWith("#")) {
-                    continue;
-                }
-                strings.add(line);
-            }
+//            // 一次性载入，速度最快
+//            InputStream is = ConfigUtils.class.getResourceAsStream(fileName);
+//            closer.register(is);
+//            bytes = new byte[is.available()];
+//            is.read(bytes);
+
+            FileSystem fs = FileSystem.newInstance(getHDFSConf());
+            Path remotePath = new Path(fileName);
+            FSDataInputStream in = fs.open(remotePath);
+            closer.register(in);
+            bytes = new byte[in.available()];
+            in.read(bytes);
+
+//            // 设置缓冲器大小, 4k
+//            final int buffSize = 4096;
+//            byte[] bf = new byte[buffSize];
+//            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffSize);
+//            closer.register(bufferedInputStream);
+//            while (bufferedInputStream.read(bf) != -1) {
+//                bbf.put(bf);
+//            }
         } catch (IOException e) {
             logger.error("loadFile {} error. error is {}.", fileName, e);
             throw e;
         } finally {
             closer.close();
         }
-
-        return ;
+        // 转换模式
+//        bbf.flip();
+//        byte[] bytes = new byte[bbf.remaining()];
+//        bbf.get(bytes);
+        return bytes;
     }
 
     public static Map<String, ChinaIdArea> getIdCardMap() {

@@ -6,7 +6,7 @@
 
     <groupId>com.chinagoods.bigdata</groupId>
     <artifactId>hive-third-functions</artifactId>
-    <version>2.2.3</version>
+    <version>2.2.4</version>
 
     <name>hive-third-functions</name>
     <url>https://github.com/aaronshan/hive-third-functions</url>
@@ -27,7 +27,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.targetJdk>1.6</project.build.targetJdk>
+        <project.build.targetJdk>1.8</project.build.targetJdk>
         <project.report.outputEncoding>UTF-8</project.report.outputEncoding>
         <project.report.inputEncoding>UTF-8</project.report.inputEncoding>
 
@@ -43,8 +43,8 @@
         <junit.version>4.12</junit.version>
         <lambda.from.string.version>1.6</lambda.from.string.version>
         <logback-classic-version>1.2.4</logback-classic-version>
-        <jar-scope>compile</jar-scope>
-<!--        <jar-scope>provided</jar-scope>-->
+<!--        <jar-scope>compile</jar-scope>-->
+        <jar-scope>provided</jar-scope>
     </properties>
 
     <dependencyManagement>
@@ -158,13 +158,13 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
-            <scope>provided</scope>
+            <scope>${jar-scope}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <scope>provided</scope>
+            <scope>${jar-scope}</scope>
         </dependency>
 
         <dependency>
@@ -247,18 +247,18 @@
             <version>1.7.25</version>
             <scope>${jar-scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback-classic-version}</version>
-            <scope>${jar-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback-classic-version}</version>
-            <scope>${jar-scope}</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-core</artifactId>-->
+<!--            <version>${logback-classic-version}</version>-->
+<!--            <scope>${jar-scope}</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <version>${logback-classic-version}</version>-->
+<!--            <scope>${jar-scope}</scope>-->
+<!--        </dependency>-->
         <!-- Add the log4j -> sfl4j (-> logback) bridge into the classpath
         Hadoop is logging to log4j! -->
         <dependency>
