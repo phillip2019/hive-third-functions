@@ -43,8 +43,7 @@
         <junit.version>4.12</junit.version>
         <lambda.from.string.version>1.6</lambda.from.string.version>
         <logback-classic-version>1.2.4</logback-classic-version>
-<!--        <jar-scope>compile</jar-scope>-->
-        <jar-scope>provided</jar-scope>
+        <jar-scope>compile</jar-scope>
     </properties>
 
     <dependencyManagement>
@@ -339,7 +338,10 @@
 
     <profiles>
         <profile>
-            <id>release</id> <!-- 部署要用到 -->
+            <id>pro</id> <!-- 部署要用到 -->
+            <properties>
+                <jar-scope>provided</jar-scope>
+            </properties>
             <build>
                 <plugins>
                     <!-- Source -->

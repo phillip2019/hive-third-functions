@@ -63,6 +63,7 @@ mvn clean package -DskipTests
 |pinyin(string) -> string | 将汉字转换为拼音|
 |md5(string) -> string | md5 哈希|
 |sha256(string) -> string |sha256 哈希|
+|full2half(string) -> string |将全角转换成半角|
 
 ### 2. 数组函数
 
