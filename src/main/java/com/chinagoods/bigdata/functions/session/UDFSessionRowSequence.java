@@ -1,19 +1,18 @@
 package com.chinagoods.bigdata.functions.session;
 
 import com.chinagoods.bigdata.functions.regexp.Re2JRegexp;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.hive.ql.udf.UDFType;
-import org.apache.hadoop.io.BooleanWritable;
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.ObjectWritable;
+import org.apache.hadoop.io.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * UDFSessionRowSequence.
+ * @author xiaowei.song
  */
 @Description(name = "session_row_sequence",
         value = "_FUNC_(distinct_id, event, created_at) - Returns a generated row sequence number starting from 1")
@@ -27,17 +26,17 @@ public class UDFSessionRowSequence extends UDF {
     public static final String APP_START_NAME = "$AppStart";
     public static final String APP_END_NAME = "$AppEnd";
 
-    private LongWritable result = new LongWritable();
-    private LongWritable createdAt = new LongWritable();
-    private ObjectWritable distinctId = new ObjectWritable();
-    private BooleanWritable appEndFlag = new BooleanWritable();
+    private static volatile Long result = 0L;
+    private static volatile Long createdAt = 0L;
+    private static volatile String distinctId = "";
+    private static volatile Boolean appEndFlag = Boolean.FALSE;
 
     public UDFSessionRowSequence() {
-        result.set(0);
-        appEndFlag.set(false);
+        appEndFlag = Boolean.FALSE;
     }
 
-    public LongWritable evaluate(String distinctIdStr, String eventNameStr, String iCreatedAt) {
+    public Long evaluate(String distinctIdStr, String eventNameStr, String iCreatedAt) {
+        log.info(String.format("distinctId=%s,  event=%s,   createdAt=%s", distinctIdStr, eventNameStr, iCreatedAt));
         Long createdAtLong = Long.valueOf(iCreatedAt);
 
         if (StringUtils.isBlank(distinctIdStr)) {
@@ -49,35 +48,35 @@ public class UDFSessionRowSequence extends UDF {
         }
 
         // 起始阶段赋值
-        if (result.get() == 0) {
-            result.set(result.get() + 1);
+        if (result == 0) {
+            result++;
             setLagStatus(distinctIdStr, createdAtLong);
         }
 
-        String lagDistinctId = (String) distinctId.get();
-        Long lagCreatedAt = createdAt.get();
+        String lagDistinctId = distinctId;
+        Long lagCreatedAt = createdAt;
 
 
         // 若上一个distinct_id、platformType、platformLang跟此时不一致，则重置row_number
         if (!lagDistinctId.equals(distinctIdStr)) {
-            result.set(0);
-            result.set(result.get() + 1);
+            result = 0L;
+            result++;
         } else if (APP_START_NAME.equals(eventNameStr) ||
                 createdAtLong - lagCreatedAt > MAX_SESSION_INTERVAL_SEC ||
-                appEndFlag.get()) {
-            appEndFlag.set(false);
-            result.set(result.get() + 1);
+                appEndFlag) {
+            appEndFlag = false;
+            result++;
         }
 
         if (APP_END_NAME.equals(eventNameStr)) {
-            appEndFlag.set(true);
+            appEndFlag = true;
         }
         setLagStatus(distinctIdStr, createdAtLong);
         return result;
     }
 
     private void setLagStatus(String distinctIdStr, Long createdAtLong) {
-        createdAt.set(createdAtLong);
-        distinctId.set(distinctIdStr);
+        createdAt = createdAtLong;
+        distinctId = distinctIdStr;
     }
 }
