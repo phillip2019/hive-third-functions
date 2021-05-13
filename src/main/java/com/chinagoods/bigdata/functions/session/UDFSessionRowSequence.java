@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.UDFType;
 import org.apache.hadoop.io.*;
 import org.slf4j.Logger;
@@ -15,7 +16,10 @@ import org.slf4j.LoggerFactory;
  * @author xiaowei.song
  */
 @Description(name = "session_row_sequence",
-        value = "_FUNC_(distinct_id, event, created_at) - Returns a generated row sequence number starting from 1")
+        value = "_FUNC_(distinct_id, event, created_at) - Returns a generated row sequence number starting from 1",
+        extended = "Example:\n"
+                + "  > SELECT session_row_sequence(distinct_id, event, created_at) FROM src LIMIT 100; " +
+                "Please note that this requires the original table to be in order")
 @UDFType(deterministic = false, stateful = true)
 public class UDFSessionRowSequence extends UDF {
     private static final Logger log = LoggerFactory.getLogger(Re2JRegexp.class);
@@ -35,9 +39,17 @@ public class UDFSessionRowSequence extends UDF {
         appEndFlag = Boolean.FALSE;
     }
 
-    public Long evaluate(String distinctIdStr, String eventNameStr, String iCreatedAt) {
-        log.info(String.format("distinctId=%s,  event=%s,   createdAt=%s", distinctIdStr, eventNameStr, iCreatedAt));
+    public Long evaluate(String distinctIdStr, String eventNameStr, String iCreatedAt) throws HiveException {
+
+        log.debug(String.format("distinctId=%s,  event=%s,   createdAt=%s", distinctIdStr, eventNameStr, iCreatedAt));
         Long createdAtLong = Long.valueOf(iCreatedAt);
+
+        // 若原表无序，则报错
+        if (distinctId.equals(distinctIdStr) && createdAtLong < createdAt) {
+            log.error("原表无序, lagDistinctId={},      lagCreatedAt={}; distinctId={},     createdAt={}",
+                    distinctId, createdAt, distinctIdStr, iCreatedAt);
+            throw new HiveException(String.format("原表无序, 此函数必须有序，无序得出结果不正确，请先将表更改成有序表, lagDistinctId=%s,      lagCreatedAt=%s; distinctId=%s,     createdAt=%s", distinctId, createdAt, distinctIdStr, iCreatedAt));
+        }
 
         if (StringUtils.isBlank(distinctIdStr)) {
             distinctIdStr = "";
