@@ -5,10 +5,13 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.chinagoods.bigdata.functions.json.UDFJsonArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ruifeng.shan
@@ -19,6 +22,8 @@ import org.apache.hadoop.io.Text;
         , value = "_FUNC_(value) - Unescape the URL encoded value. This function is the inverse of url_encode()"
         , extended = "Example:\n > select _FUNC_(value) from src;")
 public class UDFUrlDecode extends UDF {
+    public static final Logger logger = LoggerFactory.getLogger(UDFUrlDecode.class);
+
     private Text result = new Text();
     /**
      * 正则表达式，匹配结尾为%\d或%$字符
@@ -40,13 +45,16 @@ public class UDFUrlDecode extends UDF {
 
             result.set(URLDecoder.decode(value, "UTF-8"));
             return result;
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(e);
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            logger.error("url_decode转码失败，此字符串无法转码: {}", value, e);
+            result.set(value);
+            return result;
+//            throw new AssertionError(e);
         }
     }
 
     public static void main(String[] args) {
-        String url = "https://m.baidu.com/video/page?pd=video_page&nid=8105915274339468677&sign=7914032158871621252&word=%E5%B0%8F%E7%8C%AA%E4%BD%A9%E5%A5%87+%E7%AC%AC7%E5%AD%A3+%E7%AC%AC53%E9%9B%86&oword=%E5%B0%8F%E7%8C%A";
+        String url = "http://m.chinagoods.com/callApp/buyer?code=AI#mCHMv5C%dqMJ0";
         System.out.println((new UDFUrlDecode()).evaluate(url));
     }
 }
