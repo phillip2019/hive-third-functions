@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -29,7 +31,7 @@ public class UDFAdUrlFormat extends UDF {
             "utm_content"
             ));
 
-    public String evaluate(String value) {
+    public String evaluate(String value) throws MalformedURLException {
         if (value == null) {
             return null;
         }
@@ -39,10 +41,12 @@ public class UDFAdUrlFormat extends UDF {
         logger.debug("转义之后的URL为: {}", value);
 
 
-        URI adUri = URI.create(value);
+//        URI adUri = URI.create(value);
+        URL adUri = new URL(value);
         Map<String, Object> paramsMap = HttpParamUtil.getParameter(value);
 
-        return String.format("%s://%s?utm_campaign=%s&utm_source=%s&utm_medium=%s&utm_content=%s", adUri.getScheme(), adUri.getAuthority(),
+        return String.format("%s://%s%s?utm_campaign=%s&utm_source=%s&utm_medium=%s&utm_content=%s", adUri.getProtocol(), adUri.getAuthority(),
+                adUri.getPath(),
                 paramsMap.getOrDefault("utm_campaign", ""),
                 paramsMap.getOrDefault("utm_source", ""),
                 paramsMap.getOrDefault("utm_medium", ""),
@@ -50,14 +54,14 @@ public class UDFAdUrlFormat extends UDF {
         );
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
-//        String url = "https://m.chinagoods.com?utm_campaign=515活动&utm_source=头条&utm_medium=cpc&utm_content=头条-首页WAP-515活动、#tt_daymode=1";
-//        System.out.println((new UDFAdUrlFormat()).evaluate(url));
+    public static void main(String[] args) throws UnsupportedEncodingException, MalformedURLException {
+        String url = "https://m.chinagoods.com/shop/8002418?utm_campaign=%E58%95%3E&utm_source=4a&utm_medium=cpc&utm_content=4a-F%CE%WAP-%E58%95%3E&custom_ua=novel_webview&fp=a_fake_fp&version_code=7.1.5&tma_jssdk_version=1.31.1.2&app_name=news_article_lite&vid=D98F40E9-DB7D-4678-B4A7-F998DA4A9404&device_id=36725067842&channel=App%20Store&resolution=1242*2208&aid=35&ab_version=1859936,668908,2756108,668907,2756104,668905,2756072,668906,2756080,668904,2756063,668903,2756098,2571776&ab_feature=79452";
+        System.out.println((new UDFAdUrlFormat()).evaluate(url));
 
 //        String str = "515æ´»å\u008A¨";
-        String str = "515活动";
-        String newStr = new String(str.getBytes("ISO8859-1"),"UTF-8");
-//        System.out.println(newStr);
-        System.out.println(CgStringUtils.getEncoding(str));
+//        String str = "515活动";
+//        String newStr = new String(str.getBytes("ISO8859-1"),"UTF-8");
+////        System.out.println(newStr);
+//        System.out.println(CgStringUtils.getEncoding(str));
     }
 }

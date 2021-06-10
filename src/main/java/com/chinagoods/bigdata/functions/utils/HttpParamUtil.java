@@ -23,19 +23,19 @@ public class HttpParamUtil {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
             url = URLDecoder.decode(url, StandardCharsets.UTF_8.name());
-            if (url.indexOf('?') != -1) {
-                final String contents = url.substring(url.indexOf('?') + 1);
-                String[] keyValues = contents.split("[&#]");
-                for (int i = 0; i < keyValues.length; i++) {
-                    String key = keyValues[i].substring(0, keyValues[i].indexOf("="));
-                    String value = keyValues[i].substring(keyValues[i].indexOf("=") + 1);
-                    // value去除特殊字符
-                    value = value.replaceAll("[.、']", "");
-                    map.put(key, value);
-                }
-            }
         } catch (Exception e) {
             logger.error("url解码异常: {}", url, e);
+        }
+        if (url.indexOf('?') != -1) {
+            final String contents = url.substring(url.indexOf('?') + 1);
+            String[] keyValues = contents.split("[&#]");
+            for (int i = 0; i < keyValues.length; i++) {
+                String key = keyValues[i].substring(0, keyValues[i].indexOf("="));
+                String value = keyValues[i].substring(keyValues[i].indexOf("=") + 1);
+                // value去除特殊字符
+                value = value.replaceAll("[.、']", "");
+                map.put(key, value);
+            }
         }
         return map;
     }
