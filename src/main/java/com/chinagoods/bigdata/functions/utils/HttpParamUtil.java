@@ -30,6 +30,10 @@ public class HttpParamUtil {
             final String contents = url.substring(url.indexOf('?') + 1);
             String[] keyValues = contents.split("[&#]");
             for (int i = 0; i < keyValues.length; i++) {
+                // url结尾为/非标准k=v格式，跳过
+                if (!keyValues[i].contains("=")) {
+                    continue;
+                }
                 String key = keyValues[i].substring(0, keyValues[i].indexOf("="));
                 String value = keyValues[i].substring(keyValues[i].indexOf("=") + 1);
                 // value去除特殊字符
@@ -45,7 +49,7 @@ public class HttpParamUtil {
      * @param args
      */
     public static void main(String[] args) {
-        String url = "https://www.xxxx.com?id=100001&name=张三&age=25";
+        String url = "https://www.chinagoods.com/activies/special?code=202107131418516200819335&active_code=202107131418516200819335&id=545?utm_campaign=????&utm_source=??&utm_medium=cpc&utm_content=??-????WAP-????#/";
         Map<String, Object> map = getParameter(url);
         System.out.println(map);
     }
