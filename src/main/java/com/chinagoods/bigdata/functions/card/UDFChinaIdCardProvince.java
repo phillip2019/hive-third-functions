@@ -23,7 +23,11 @@ public class UDFChinaIdCardProvince extends UDF {
         if (idCard == null) {
             return null;
         }
-        result.set(CardUtils.getIdCardProvince(idCard.toString()));
+        String province = CardUtils.getIdCardProvince(idCard.toString());
+        if (province == null) {
+            return null;
+        }
+        result.set(province);
         return result;
     }
 }

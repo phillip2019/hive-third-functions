@@ -23,7 +23,11 @@ public class UDFChinaIdCardInfo extends UDF {
         if (idCard == null) {
             return null;
         }
-        result.set(CardUtils.getJsonOfChinaIdCard(idCard.toString()));
+        String cardInfo = CardUtils.getJsonOfChinaIdCard(idCard.toString());
+        if (cardInfo == null) {
+            return null;
+        }
+        result.set(cardInfo);
         return result;
     }
 }

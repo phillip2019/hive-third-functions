@@ -23,7 +23,11 @@ public class UDFChinaIdCardBirthday extends UDF{
         if (idCard == null) {
             return null;
         }
-        result.set(CardUtils.getIdCardBirthday(idCard.toString()));
+        String birthday = CardUtils.getIdCardBirthday(idCard.toString());
+        if (birthday == null) {
+            return null;
+        }
+        result.set(birthday);
         return result;
     }
 }

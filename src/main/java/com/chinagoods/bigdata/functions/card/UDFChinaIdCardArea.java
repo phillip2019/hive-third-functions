@@ -23,7 +23,11 @@ public class UDFChinaIdCardArea extends UDF {
         if (idCard == null) {
             return null;
         }
-        result.set(CardUtils.getIdCardArea(idCard.toString()));
+        String area = CardUtils.getIdCardArea(idCard.toString());
+        if (area == null) {
+            return null;
+        }
+        result.set(area);
         return result;
     }
 }
