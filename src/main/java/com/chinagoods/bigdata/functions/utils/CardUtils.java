@@ -113,7 +113,7 @@ public class CardUtils {
                     return false;
                 }
                 char validateCode = getValidateCode(card17);
-                if (validateCode == card.charAt(17)) {
+                if (validateCode == card.charAt(17) && getCardValue(card) != null) {
                     return true;
                 }
             } else if (cardLength == 15) {
