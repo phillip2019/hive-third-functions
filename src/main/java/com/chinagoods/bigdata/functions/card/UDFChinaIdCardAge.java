@@ -43,10 +43,17 @@ public class UDFChinaIdCardAge extends UDF{
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
         String ds = df.format(new Date());
         int birthday = CardUtils.getIdCardAge(idCard.toString(), ds.toString());
+        System.out.println(birthday);
         if (birthday == -2) {
             return null;
         }
         result.set(String.valueOf(birthday));
         return result;
+    }
+
+    public static void main(String[] args) throws ParseException {
+        String idCard = "372927197901133326";
+        UDFChinaIdCardAge udfChinaIdCardAge = new UDFChinaIdCardAge();
+        System.out.println(udfChinaIdCardAge.evaluate(new Text(idCard)));
     }
 }

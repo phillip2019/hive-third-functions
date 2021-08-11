@@ -93,7 +93,7 @@ public class CardUtils {
                 return -1;
             }
 
-            int age = dsCal.get(Calendar.YEAR)-born.get(Calendar.YEAR);
+            int age = dsCal.get(Calendar.YEAR) - born.get(Calendar.YEAR);
             if(dsCal.get(Calendar.DAY_OF_YEAR) < born.get(Calendar.DAY_OF_YEAR)) {
                 age -= 1;
             }
