@@ -1,10 +1,18 @@
 package com.chinagoods.bigdata.functions.utils;
 
+import com.chinagoods.bigdata.functions.array.UDFArraySum;
 import com.chinagoods.bigdata.functions.model.ChinaIdArea;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -13,6 +21,7 @@ import java.util.Map;
  * time: 19:35
  */
 public class CardUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(CardUtils.class);
     private static final Map<String, ChinaIdArea> chinaIdAreaMap = ConfigUtils.getIdCardMap();
     private static int[] weight = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};    //十七位数字本体码权重
     private static char[] validate = {'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};    //mod11,对应校验码字符值
@@ -63,6 +72,37 @@ public class CardUtils {
         return null;
     }
 
+    public static int getIdCardAge(String card, String ds) throws ParseException {
+        if (isValidIdCard(card)) {
+            int cardLength = card.length();
+            String birthday = card.substring(6, 14);
+            if (cardLength == 15) {
+                birthday = "19" + card.substring(6, 12);
+            }
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+            Calendar dsCal = Calendar.getInstance();
+            Date dsDate = df.parse(ds);
+            dsCal.setTime(dsDate);
+
+            Date birth = df.parse(birthday);
+            Calendar born = Calendar.getInstance();
+            born.setTime(birth);
+
+            if(born.after(dsDate)){
+                LOG.error("Can't be born in the future");
+                return -1;
+            }
+
+            int age = dsCal.get(Calendar.YEAR)-born.get(Calendar.YEAR);
+            if(dsCal.get(Calendar.DAY_OF_YEAR) < born.get(Calendar.DAY_OF_YEAR)) {
+                age -= 1;
+            }
+            return age;
+
+        }
+        return -2;
+    }
+
     public static String getIdCardBirthday(String card) {
         if (isValidIdCard(card)) {
             int cardLength = card.length();
@@ -72,7 +112,6 @@ public class CardUtils {
                 return card.substring(6, 14);
             }
         }
-
         return null;
     }
 
@@ -81,9 +120,9 @@ public class CardUtils {
             int cardLength = card.length();
             int genderValue;
             if (cardLength == 15) {
-                genderValue = card.charAt(15) - 48;
+                genderValue = card.charAt(14) - 48;
             } else {
-                genderValue = card.charAt(17) - 48;
+                genderValue = card.charAt(16) - 48;
             }
 
             if (genderValue % 2 == 0) {
