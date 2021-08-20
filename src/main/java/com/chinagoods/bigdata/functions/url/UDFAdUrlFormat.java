@@ -42,8 +42,18 @@ public class UDFAdUrlFormat extends UDF {
 
 
 //        URI adUri = URI.create(value);
-        URL adUri = new URL(value);
+        URL adUri = null;
+        try {
+            adUri = new URL(value);
+        } catch (Exception e) {
+            logger.error("解析ad url失败，{}", value, e);
+        }
         Map<String, Object> paramsMap = HttpParamUtil.getParameter(value);
+
+        // Fixed me。 若广告解析为null，则返回null
+        if (adUri == null) {
+            return null;
+        }
 
         return String.format("%s://%s%s?utm_campaign=%s&utm_source=%s&utm_medium=%s&utm_content=%s", adUri.getProtocol(), adUri.getAuthority(),
                 adUri.getPath(),
