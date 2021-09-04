@@ -6,12 +6,8 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author aaron02
@@ -20,28 +16,20 @@ import java.util.List;
 @Description(name = "sequence"
         , value = "_FUNC_(start, stop) - Generate a sequence of integers from start to stop.\n" +
         "_FUNC_(start, stop, step) - Generate a sequence of integers from start to stop, incrementing by step."
-        , extended = "Example:\n > select _FUNC_(1, 5) from src;\n > select _FUNC_(1, 9, 4) from src;\n" +
-        " > select _FUNC_('2016-04-12', '2016-04-14') from src;")
+        , extended = "Example:\n > select _FUNC_(1, 5) from src;\n > select _FUNC_(1, 9, 4) from src;\n")
 public class UDFSequence extends UDF {
-    public final static DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     private static final long MAX_RESULT_ENTRIES = 10000;
 
     public UDFSequence() {
 
     }
 
-    public Object evaluate(LongWritable start, LongWritable stop) throws HiveException {
-        return fixedWidthSequence(start.get(), stop.get(), stop.get() >= start.get() ? 1 : -1, Long.class);
+    public ArrayList<Long> evaluate(LongWritable start, LongWritable stop) throws HiveException {
+        return fixedWidthSequence(start.get(), stop.get(), stop.get() >= start.get() ? 1 : -1);
     }
 
-    public Object evaluate(LongWritable start, LongWritable stop, LongWritable step) throws HiveException {
-        return fixedWidthSequence(start.get(), stop.get(), step.get(), Long.class);
-    }
-
-    public Object evaluate(Text start, Text stop, long step) throws HiveException {
-        long startMillis = DateTime.parse(start.toString(), DEFAULT_DATE_FORMATTER).getMillis();
-        long stopMillis = DateTime.parse(stop.toString(), DEFAULT_DATE_FORMATTER).getMillis();
-        return fixedWidthSequence(startMillis, stopMillis, step, String.class);
+    public ArrayList<Long> evaluate(LongWritable start, LongWritable stop, LongWritable step) throws HiveException {
+        return fixedWidthSequence(start.get(), stop.get(), step.get());
     }
 
     public static int toIntExact(long value) {
@@ -51,28 +39,16 @@ public class UDFSequence extends UDF {
         return (int)value;
     }
 
-    private static Object fixedWidthSequence(long start, long stop, long step, Class type) throws HiveException {
+    private static ArrayList<Long> fixedWidthSequence(long start, long stop, long step) throws HiveException {
         checkValidStep(start, stop, step);
 
         int length = toIntExact((stop - start) / step + 1L);
         checkMaxEntry(length);
-
-        if (type == long.class || type == Long.class) {
-            List<Long> result = Lists.newArrayList();
-            for (long i = 0, value = start; i < length; ++i, value += step) {
-                result.add(value);
-            }
-            return result;
-        } else if (type == String.class){
-            List<String> result = Lists.newArrayList();
-            for (long i = 0, value = start; i < length; ++i, value += step) {
-                DateTime dateTime = new DateTime(value);
-                result.add(dateTime.toString(DEFAULT_DATE_FORMATTER));
-            }
-            return result;
-        } else {
-            throw new HiveException("Don't support this class type!" + type);
+        ArrayList<Long> result = Lists.newArrayList();
+        for (long i = 0, value = start; i < length; ++i, value += step) {
+            result.add(value);
         }
+        return result;
     }
 
     private static void checkValidStep(long start, long stop, long step) throws HiveException {
