@@ -1,22 +1,23 @@
 package com.chinagoods.bigdata.functions.array;
 
-import com.chinagoods.bigdata.functions.json.UDFJsonArray;
-import com.chinagoods.bigdata.functions.utils.JacksonBuilder;
-import com.chinagoods.bigdata.functions.utils.json.JsonExtract;
-import com.chinagoods.bigdata.functions.utils.json.JsonPath;
-import com.chinagoods.bigdata.functions.utils.json.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.hadoop.hive.ql.exec.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
-import org.apache.hadoop.hive.serde2.objectinspector.*;
+import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author xiaowei.song
@@ -31,10 +32,10 @@ public class UDFArray2String extends GenericUDF {
     private Text result;
 
     private static final int ARRAY_IDX = 0;
-    private static final int VALUE_IDX = 1;
     private static final int ARG_COUNT = 1; // Number of arguments to this UDF
     private transient ListObjectInspector arrayOI;
     private transient ObjectInspector arrayElementOI;
+    private transient MapObjectInspector mapObjectInspector;
 
     public UDFArray2String() {
     }
@@ -66,11 +67,27 @@ public class UDFArray2String extends GenericUDF {
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
         result.clear();
         Object array = arguments[ARRAY_IDX].get();
+
+        int arrayLength = arrayOI.getListLength(array);
+
+        // Check if array is null or empty
+        if (arrayLength <= 0) {
+            result.set("[]");
+            return result;
+        }
+        ArrayList<MapObjectInspector> resultList = new ArrayList<MapObjectInspector>();
+        for (int i = 0; i < arrayLength; i++) {
+            MapObjectInspector arrayElement = (MapObjectInspector)arrayOI.getListElement(array, i);
+            resultList.add(arrayElement);
+        }
+
+        // Creating Object of ObjectMapper define in Jakson Api
+        ObjectMapper ObjMapper = new ObjectMapper();
         try {
-            result.set(JacksonBuilder.mapper.writeValueAsString(array));
+            String resultStr = ObjMapper.writeValueAsString(resultList);
+            result.set(resultStr);
         } catch (JsonProcessingException e) {
             logger.error("解析对象失败，错误为： ", e);
-            result.set("[\"errMsg\": \"序列化对象失败\"]");
         }
         return result;
     }
@@ -79,6 +96,14 @@ public class UDFArray2String extends GenericUDF {
     public String getDisplayString(String[] strings) {
         assert (strings.length == ARG_COUNT);
         return "array2string(" + strings[ARRAY_IDX] + ")";
+    }
+
+    public static void main(String[] args) throws JsonProcessingException {
+        List<String> ls = new ArrayList<>();
+        ls.add("1");
+        ObjectMapper ObjMapper = new ObjectMapper();
+        String resultStr = ObjMapper.writeValueAsString(ls);
+        System.out.println(resultStr);
     }
 
 }
