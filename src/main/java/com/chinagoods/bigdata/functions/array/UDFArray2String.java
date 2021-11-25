@@ -11,7 +11,9 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,10 +77,13 @@ public class UDFArray2String extends GenericUDF {
             result.set("[]");
             return result;
         }
-        ArrayList<MapObjectInspector> resultList = new ArrayList<MapObjectInspector>();
+        ArrayList<Object> resultList = new ArrayList<>();
+        StringObjectInspector stringObjectInspector = (StringObjectInspector) arrayOI.getListElementObjectInspector();
         for (int i = 0; i < arrayLength; i++) {
-            MapObjectInspector arrayElement = (MapObjectInspector)arrayOI.getListElement(array, i);
-            resultList.add(arrayElement);
+            Object arrayElement = arrayOI.getListElement(array, i);
+            String elementValue = stringObjectInspector.getPrimitiveJavaObject(arrayElement);
+            logger.info("map对象元素为: {}", elementValue);
+            resultList.add(elementValue);
         }
 
         // Creating Object of ObjectMapper define in Jakson Api
