@@ -27,7 +27,7 @@ public class UDFChinaIdCard15to18 extends UDF {
     private Text result = new Text();
 
     // 每位加权因子
-    private static final int power[] = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+    private static final int[] power = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
 
     public UDFChinaIdCard15to18() {
     }
@@ -43,8 +43,8 @@ public class UDFChinaIdCard15to18 extends UDF {
     /**
      * 将15位的身份证转成18位身份证
      *
-     * @param idCard
-     * @return
+     * @param idCard 身份证号码
+     * @return idCard 转换完成的身份证号码
      */
     public static String convertIdCardBy15bit(String idCard) {
         String idCard17 = null;
@@ -72,7 +72,7 @@ public class UDFChinaIdCard15to18 extends UDF {
             char[] c = idCard17.toCharArray();
             String checkCode = "";
 
-            int bit[];
+            int[] bit;
 
             // 将字符数组转为整型数组
             bit = convertCharToInt(c);
