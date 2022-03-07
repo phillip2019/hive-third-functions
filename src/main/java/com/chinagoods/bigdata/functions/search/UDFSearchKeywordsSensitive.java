@@ -62,21 +62,21 @@ public class UDFSearchKeywordsSensitive extends GenericUDF {
         }
 
         return PrimitiveObjectInspectorFactory
-                .writableIntObjectInspector;
+                .javaIntObjectInspector;
     }
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
         assert (arguments.length == ARG_COUNT);
 
-        if (arguments[0].get() == null || StringUtils.isBlank((String) arguments[0].get())) {
+        if (arguments[0].get() == null || StringUtils.isBlank(arguments[0].get().toString())) {
             return 0;
         }
 
         try {
-            Text keywords = (Text) converters[0].convert(arguments[0].get());
+            String keywords = converters[0].convert(arguments[0].get()).toString();
             for (String sensitiveKeyword : keywordsSensitive) {
-                if (StringUtils.contains(keywords.toString(), sensitiveKeyword)) {
+                if (StringUtils.contains(keywords, sensitiveKeyword)) {
                     return 1;
                 }
             }
