@@ -162,6 +162,13 @@
                 <artifactId>ip2region</artifactId>
                 <version>1.7.2</version>
             </dependency>
+
+            <!-- mysql依赖 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.47</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -301,6 +308,12 @@
         <dependency>
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
+        </dependency>
+
+        <!-- mysql依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
     </dependencies>
 
