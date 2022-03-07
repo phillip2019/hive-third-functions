@@ -16,8 +16,8 @@ public class HttpParamUtil {
 
     /**
      * 获得url中参数
-     * @param url
-     * @return
+     * @param url url链接
+     * @return url中参数map
      */
     public static Map<String, Object> getParameter(String url) {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -45,8 +45,7 @@ public class HttpParamUtil {
     }
     /**
      * 测试
-     *
-     * @param args
+     * @param args main方法参数列表
      */
     public static void main(String[] args) {
         String url = "https://www.chinagoods.com/activies/special?code=202107131418516200819335&active_code=202107131418516200819335&id=545?utm_campaign=????&utm_source=??&utm_medium=cpc&utm_content=??-????WAP-????#/";

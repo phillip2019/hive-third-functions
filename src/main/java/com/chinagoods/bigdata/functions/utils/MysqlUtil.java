@@ -45,6 +45,7 @@ public class MysqlUtil {
 
     /**
      * 查询表中关键词
+     * @return keywords sensitive set违禁词集合
      * @throws SQLException 查詢異常
      */
      public Set<String> getSearchSensitiveKeywords() throws SQLException {

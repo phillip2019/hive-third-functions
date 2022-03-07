@@ -29,13 +29,13 @@ mvn install:install-file -DgroupId=javax.jdo -DartifactId=jdo2-api -Dversion=2.3
 
 ```
 cd ${project_home}
-mvn clean package
+mvn clean package -Ppro
 ```
 
 If you want to skip unit tests, please run:
 ```
 cd ${project_home}
-mvn clean package -DskipTests
+mvn clean package -DskipTests -Ppro
 ```
 
 It will generate hive-third-functions-${version}-shaded.jar in target directory.
