@@ -1,4 +1,4 @@
-package com.chinagoods.bigdata.functions.search;
+package com.chinagoods.bigdata.functions.risk;
 
 import com.chinagoods.bigdata.functions.utils.MysqlUtil;
 import org.apache.commons.lang.StringUtils;
@@ -10,29 +10,38 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author xiaowei.song
- * date: 2022-03-07
+ * date: 2022-03-23
  * time: 14:48
  */
-@Description(name = "search_keywords_sensitive", value = "_FUNC_(str) - Determines whether the keyword is a prohibited word, if it returns 1, otherwise returns 0. "
+@Description(name = "risk_keywords", value = "_FUNC_(str) - Determines whether the keyword is a prohibited word, if it returns comma string, otherwise returns null. "
         , extended = "Example:\n"
         + "  > SELECT _FUNC_(key_word) FROM src LIMIT 1;")
-public class UDFSearchKeywordsSensitive extends GenericUDF {
+public class UDFRiskKeywords extends GenericUDF {
 
-    public static final String DB_URL = "jdbc:mysql://172.18.7.7:3306/cg_search?characterEncoding=UTF-8&useSSL=false";
-    public static final String DB_USER = "cg_search";
-    public static final String DB_PASSWORD = "GPuBoTWz3UiMwwLz";
-    public static final String SELECT_SENSITIVE_KEYWORDS_SQL = "select words key_word\n" +
-            "from lexicon_sensitive ls\n" +
-            "where 1=1\n" +
-            "and status = 0\n" +
-            "and is_deleted = 0";
+    private static final Logger logger = LoggerFactory.getLogger(UDFRiskKeywords.class);
+
+    public static final String DB_URL = "jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false";
+    public static final String DB_USER = "datax";
+    public static final String DB_PASSWORD = "oRvmRrVJeOCl8XsY";
+    public static final String SELECT_RISK_KEYWORDS_SQL = "select t.key_word\n" +
+            "from risk_control_keywords t\n" +
+            "inner join (\n" +
+            "\tselect key_word\n" +
+            "\t,max(create_time) max_create_time\n" +
+            "\tfrom risk_control_keywords\n" +
+            "\tgroup by key_word\n" +
+            ") nt on t.create_time =  nt.max_create_time and t.key_word = nt.key_word\n" +
+            "where t.is_deleted = '否'";
 
     private ObjectInspectorConverters.Converter[] converters;
 
@@ -44,9 +53,9 @@ public class UDFSearchKeywordsSensitive extends GenericUDF {
     /**
      * 搜索关键词禁用表
      **/
-    public Set<String> keywordsSensitive = new HashSet<String>();
+    public Set<String> riskKeywordsSet = new HashSet<String>();
 
-    public UDFSearchKeywordsSensitive() {
+    public UDFRiskKeywords() {
     }
 
     @Override
@@ -65,13 +74,12 @@ public class UDFSearchKeywordsSensitive extends GenericUDF {
         // 查询现有搜索引擎禁用词
         MysqlUtil mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
         try {
-            keywordsSensitive = mysqlUtil.getKeywords(SELECT_SENSITIVE_KEYWORDS_SQL);
+            riskKeywordsSet = mysqlUtil.getKeywords(SELECT_RISK_KEYWORDS_SQL);
         } catch (SQLException e) {
-            throw new UDFArgumentException(String.format("Failed to query the set of prohibited words in the search engine database, the error details are: %s", e));
+            throw new UDFArgumentException(String.format("Failed to query the set of prohibited words in the risk database, the error details are: %s", e));
         }
 
-        return PrimitiveObjectInspectorFactory
-                .javaIntObjectInspector;
+        return PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     }
 
     @Override
@@ -79,25 +87,29 @@ public class UDFSearchKeywordsSensitive extends GenericUDF {
         assert (arguments.length == ARG_COUNT);
 
         if (arguments[0].get() == null || StringUtils.isBlank(arguments[0].get().toString())) {
-            return 0;
+            return null;
+        }
+        Set<String> hitKeywordSet = new TreeSet<>();
+
+        String goodName;
+        try {
+            goodName = converters[0].convert(arguments[0].get()).toString();
+        } catch (Exception e) {
+            logger.error("Type conversion failed", e);
+            return null;
         }
 
-        try {
-            String keywords = converters[0].convert(arguments[0].get()).toString();
-            for (String sensitiveKeyword : keywordsSensitive) {
-                if (StringUtils.contains(keywords, sensitiveKeyword)) {
-                    return 1;
-                }
+        for (String keyword : riskKeywordsSet) {
+            if (StringUtils.contains(goodName, keyword)) {
+                hitKeywordSet.add(keyword);
             }
-            return 0;
-        } catch (Exception e) {
-            return 0;
         }
+        return StringUtils.join(hitKeywordSet, ",");
     }
 
     @Override
     public String getDisplayString(String[] strings) {
         assert (strings.length == ARG_COUNT);
-        return "search_keywords_sensitive(" + strings[0] + ")";
+        return "risk_keywords(" + strings[0] + ")";
     }
 }

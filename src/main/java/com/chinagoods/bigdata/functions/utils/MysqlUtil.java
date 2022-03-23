@@ -10,24 +10,22 @@ import java.util.Set;
 /**
  * @author xiaowei.song
  */
-public class MysqlUtil {
+final public class MysqlUtil {
     private static final Logger logger = LoggerFactory.getLogger(MysqlUtil.class);
     private Connection connection;
-    public static final String DB_URL = "jdbc:mysql://172.18.7.7:3306/cg_search?characterEncoding=UTF-8&useSSL=false";
-    public static final String DB_USER = "cg_search";
-    public static final String DB_PASSWORD = "GPuBoTWz3UiMwwLz";
+    private String dbUrl;
+    private String dbUser;
+    private String dbPassword;
 
-    public static final String SELECT_SENSITIVE_KEYWORDS_SQL = "select words key_word\n" +
-            "from lexicon_sensitive ls\n" +
-            "where 1=1\n" +
-            "and status = 0\n" +
-            "and is_deleted = 0";
     /**
      * MySQL 8.0 以下版本 - JDBC 驱动名及数据库 URL
      **/
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 
-    public MysqlUtil() {
+    public MysqlUtil(String dbUrl, String dbUser, String dbPassword) {
+        this.dbUrl = dbUrl;
+        this.dbUser = dbUser;
+        this.dbPassword = dbPassword;
         connection = getConnection();
     }
 
@@ -35,9 +33,9 @@ public class MysqlUtil {
         Connection conn = null;
         try {
             Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            conn = DriverManager.getConnection(this.dbUrl, this.dbUser, this.dbPassword);
         }catch (Exception e) {
-            logger.error("获取mysql连接失败, dbUrl: {}, username: {}, password: {}", DB_URL, DB_USER, DB_PASSWORD, e);
+            logger.error("获取mysql连接失败, dbUrl: {}, username: {}, password: {}", dbUrl, dbUser, dbPassword, e);
             System.exit(1);
         }
         return conn;
@@ -48,14 +46,14 @@ public class MysqlUtil {
      * @return keywords sensitive set违禁词集合
      * @throws SQLException 查詢異常
      */
-     public Set<String> getSearchSensitiveKeywords() throws SQLException {
+     public Set<String> getKeywords(String sql) throws SQLException {
         Set<String> keywordsSet = new HashSet<>(3000);
         // 重建mysql连接信息
         if (connection == null || connection.isClosed()) {
              connection = getConnection();
          }
         Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(SELECT_SENSITIVE_KEYWORDS_SQL);
+        ResultSet rs = stmt.executeQuery(sql);
         // 展开结果集数据库
         while(rs.next()) {
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -75,7 +73,17 @@ public class MysqlUtil {
     }
 
     public static void main(String[] args) throws SQLException {
-        MysqlUtil mysqlUtil = new MysqlUtil();
-        System.out.println(mysqlUtil.getSearchSensitiveKeywords());
+        MysqlUtil mysqlUtil = new MysqlUtil("jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false",
+                "datax",
+                "oRvmRrVJeOCl8XsY");
+        System.out.println(mysqlUtil.getKeywords("select t.key_word\n" +
+                "from risk_control_keywords t\n" +
+                "inner join (\n" +
+                "\tselect key_word\n" +
+                "\t,max(create_time) max_create_time\n" +
+                "\tfrom risk_control_keywords\n" +
+                "\tgroup by key_word\n" +
+                ") nt on t.create_time =  nt.max_create_time and t.key_word = nt.key_word\n" +
+                "where t.is_deleted = '否'"));
     }
 }
