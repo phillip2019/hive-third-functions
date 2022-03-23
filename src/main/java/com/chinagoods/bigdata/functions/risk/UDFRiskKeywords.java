@@ -79,7 +79,7 @@ public class UDFRiskKeywords extends GenericUDF {
             throw new UDFArgumentException(String.format("Failed to query the set of prohibited words in the risk database, the error details are: %s", e));
         }
 
-        return PrimitiveObjectInspectorFactory.writableStringObjectInspector;
+        return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
     @Override
