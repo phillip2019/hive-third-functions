@@ -375,10 +375,10 @@ public class UDFStandardUrlFormat extends GenericUDF {
     public ArrayList<Text> regexDealUrl(String scUrl) throws HiveException {
         String joinKey = scUrl.contains(H5_PREFIX) ? H5 : EMPTY;
         try {
-            String newScUrl = scUrl;
             List<List<String>> platFormRules = allRuleMap.get(platFormType + joinKey);
             if (platFormRules != null) {
                 for (List<String> rules : platFormRules) {
+                    String newScUrl = scUrl;
                     standardUrl = rules.get(2);
                     regex = rules.get(3);
                     unit = rules.get(4);
