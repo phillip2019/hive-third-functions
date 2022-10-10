@@ -160,7 +160,8 @@ mvn clean package -DskipTests
 | 函数| 描述 |
 |:--|:--|
 |url_encode(value) -> string | escapes value by encoding it so that it can be safely included in URL query parameter names and values|
-|url_decode(value) -> string | unescape the URL encoded value. This function is the inverse of `url_encode`. | 
+|url_decode(value) -> string | unescape the URL encoded value. This function is the inverse of `url_encode`. |
+|standard_url_format(string,string) -> array(varchar) | The normalized url returns the standard url and the 3-level category name|
 
 ### 10. 数学函数
 
@@ -261,6 +262,7 @@ create temporary function regexp_extract_all as 'UDFRe2JRegexpExtractAll';
 create temporary function regexp_like as 'UDFRe2JRegexpLike';
 create temporary function regexp_replace as 'UDFRe2JRegexpReplace';
 create temporary function regexp_split as 'UDFRe2JRegexpSplit';
+create temporary function standard_url_format as 'UDFStandardUrlFormat';
 ```
 
 你可以在hive的命令杭中使用下面的语句来查看函数的细节.
@@ -362,6 +364,7 @@ select gcj_extract_wgs(39.915, 116.404) => {"lng":116.39775549316407,"lat":39.91
 
 ```
 select url_encode('http://shanruifeng.cc/') => http%3A%2F%2Fshanruifeng.cc%2F
+select standard_url_format('wap','https://m.chinagoods.com/en/venue?id=14&dsds=d') => ["https://m.chinagoods.com/en/venue/?id=14","营销会场","营销会场","测试-领券中心"] 
 ```
 
 ```
