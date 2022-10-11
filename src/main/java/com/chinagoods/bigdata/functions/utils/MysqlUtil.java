@@ -66,7 +66,7 @@ final public class MysqlUtil {
     }
 
     public Set<String> getSet(String sql) throws SQLException {
-        Set<String> set = new HashSet<>(3000);
+        Set<String> set = new HashSet<>();
         // 重建mysql连接信息
         if (connection == null || connection.isClosed()) {
             connection = getConnection();
@@ -108,7 +108,7 @@ final public class MysqlUtil {
     }
 
     public Map<String,String> getMap(String sql) throws SQLException {
-        Map<String,String> map = new HashMap<>(5000);
+        Map<String,String> map = new HashMap<>();
         // 重建mysql连接信息
         if (connection == null || connection.isClosed()) {
             connection = getConnection();
