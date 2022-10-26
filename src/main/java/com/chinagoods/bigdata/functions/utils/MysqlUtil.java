@@ -4,8 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author xiaowei.song
@@ -64,6 +63,66 @@ final public class MysqlUtil {
         rs.close();
         stmt.close();
         return keywordsSet;
+    }
+
+    public Set<String> getSet(String sql) throws SQLException {
+        Set<String> set = new HashSet<>();
+        // 重建mysql连接信息
+        if (connection == null || connection.isClosed()) {
+            connection = getConnection();
+        }
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        // 展开结果集数据库
+        while(rs.next()) {
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                set.add((String) rs.getObject(i + 1));
+            }
+        }
+        // 完成后关闭
+        rs.close();
+        stmt.close();
+        return set;
+    }
+    
+    public List<List<String>> getLists(String sql) throws SQLException {
+        List<List<String>> resultlist = new ArrayList<>();
+        // 重建mysql连接信息
+        if (connection == null || connection.isClosed()) {
+            connection = getConnection();
+        }
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        // 展开结果集数据库
+        while(rs.next()) {
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                list.add((String) rs.getObject(i + 1));
+            }
+            resultlist.add(list);
+        }
+        // 完成后关闭
+        rs.close();
+        stmt.close();
+        return resultlist;
+    }
+
+    public Map<String,String> getMap(String sql) throws SQLException {
+        Map<String,String> map = new HashMap<>();
+        // 重建mysql连接信息
+        if (connection == null || connection.isClosed()) {
+            connection = getConnection();
+        }
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        // 展开结果集数据库
+        while(rs.next()) {
+            map.put((String) rs.getObject(1),(String) rs.getObject(2));
+        }
+        // 完成后关闭
+        rs.close();
+        stmt.close();
+        return map;
     }
 
     public void close() throws SQLException {
