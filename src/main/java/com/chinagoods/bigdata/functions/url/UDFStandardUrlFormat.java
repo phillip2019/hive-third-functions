@@ -87,6 +87,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private static final String PARAM_NULL = "NULL";
     private static final String SEPARATOR = "---";
     private static final String KV_SEPARATOR = "--";
+    private static final String KV_VALUE_SEPARATOR = "-";
     private static final String CONNECTOR_SEPARATOR = "?";
     private static final String REGEX_OR_PARAM_SEPARATOR = "/&/";
     private static final String BACKSLASH = "/";
@@ -117,6 +118,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private String regex = null;
     private String params = null;
     private ArrayList<Text> resultPageNameList = null;
+    private String multipleUrl="search/categoryProduct";
 
     public UDFStandardUrlFormat() {
     }
@@ -280,6 +282,28 @@ public class UDFStandardUrlFormat extends GenericUDF {
                             String[] keysArr = paramUrl.split(SEPARATOR);
                             for (String key : keysArr) {
                                 if (!key.equals(IMT.toLowerCase())) {
+                                    if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(multipleUrl)){
+                                        String mOrC=key.split(KV_SEPARATOR)[0];
+                                        String value=EMPTY;
+                                        if(key.contains(C.toLowerCase())){
+                                            value=key.replace(C.toLowerCase(),EMPTY);
+                                        }
+                                        if(key.contains(M.toLowerCase())){
+                                            value=key.replace(M.toLowerCase(),EMPTY);
+                                        }
+                                        if(value.contains(KV_VALUE_SEPARATOR)){
+                                            String[]arr=value.split(KV_VALUE_SEPARATOR);
+                                            if(arr!=null && arr.length>0) {
+                                                for (String v : arr) {
+                                                    String res=paramKvMap.get(mOrC + KV_SEPARATOR + v);
+                                                    if(StringUtils.isNotBlank(res)){
+                                                        nameList.add(res);
+                                                    }
+                                                }
+                                            }
+                                            continue;
+                                        }
+                                    }
                                     nameList.add(paramKvMap.get(key));
                                 }
                             }
