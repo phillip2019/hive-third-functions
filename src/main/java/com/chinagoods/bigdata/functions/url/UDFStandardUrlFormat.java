@@ -364,6 +364,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
                                 map.forEach((k, v) -> {
                                     standardUrl = String.join(CONNECTOR_SEPARATOR, k, String.join(PARAM_SEPARATOR, v));
                                 });
+                            }else if(!url.contains(CONNECTOR_SEPARATOR)){
+                                standardUrl = scUrl.substring(0,scUrl.indexOf(CONNECTOR_SEPARATOR));
                             }
                         } else if (paramType.equals(TWO)) {
                             if (!url.contains(CONNECTOR_SEPARATOR)) {
