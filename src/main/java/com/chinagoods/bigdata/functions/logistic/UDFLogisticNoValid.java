@@ -73,6 +73,7 @@ public class UDFLogisticNoValid extends UDF {
      * @return 是否合规
      **/
     public BooleanWritable evaluate(Text companyNameT, Text noT) {
+        result.set(false);
         if (companyNameT == null || noT == null) {
             return result;
         }
@@ -81,7 +82,7 @@ public class UDFLogisticNoValid extends UDF {
         String no = noT.toString();
 
         Pattern pattern = LOGISTIC_NO_PATTERN_MAP.get(companyName);
-        logger.info("匹配模式为: {}", pattern);
+        logger.debug("匹配模式为: {}", pattern);
         if (pattern == null) {
             logger.error("快递公司为空，快递公司: {}", companyName);
             return result;
