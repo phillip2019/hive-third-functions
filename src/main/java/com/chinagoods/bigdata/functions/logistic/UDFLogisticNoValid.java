@@ -33,12 +33,12 @@ public class UDFLogisticNoValid extends UDF {
             .put("EMS", Pattern.compile("^[A-Z]{2}[0-9]{9}[A-Z]{2}$|^(10|11)[0-9]{11}$|^(50|51)[0-9]{11}$|^(95|97)[0-9]{11}$"))
             .put("韵达快递", Pattern.compile("^(10|11|12|13|14|15|16|17|19|18|31|43|50|55|58|80|88|66|77|39)[0-9]{13}$|^[0-9]{13}$"))
             .put("百世快递", Pattern.compile("^(([ABDE])[0-9]{12})$|^(BXA[0-9]{10})$|^(K8[0-9]{11})$|^(02[0-9]{11})$|^(000[0-9]{10})$|^(C0000[0-9]{8})$|^((21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|61|63)[0-9]{10})$|^((50|51)[0-9]{12})$|^7[0-9]{13}$|^6[0-9]{13}$|^58[0-9]{14}$"))
-            .put("圆通速递", Pattern.compile("^[A-Za-z0-9]{2}[0-9]{10}$|^[A-Za-z0-9]{2}[0-9]{8}$|^[6-9][0-9]{17}$|^[DD]{2}[8-9][0-9]{15}$|^[Y][0-9]{12}$"))
+            .put("圆通速递", Pattern.compile("^[A-Za-z0-9]{2}[0-9]{10,13}$|^[A-Za-z0-9]{2}[0-9]{8}$|^[6-9][0-9]{17}$|^[DD]{2}[8-9][0-9]{15}$|^[Y][0-9]{12}$"))
             .put("天天快递", Pattern.compile("(66|77|88|(5(5|6|8)))\\d{10}|(99(5|8))\\d{9}|TT(66|88|99|(5(6|7)))\\d{11}"))
             .put("全峰快递", Pattern.compile("^[0-6|9][0-9]{11}$|^[7][0-8][0-9]{10}$|^[0-9]{15}$|^[S][0-9]{9,11}(-|)P[0-9]{1,2}$|^[0-9]{13}$|^[8][0,2-9][0,2-9][0-9]{9}$|^[8][1][0,2-9][0-9]{9}$|^[8][0,2-9][0-9]{10}$|^[8][1][1][0][8][9][0-9]{6}$"))
             .put("EMS经济快递", Pattern.compile("^[A-Z]{2}[0-9]{9}[A-Z]{2}$|^(10|11)[0-9]{11}$|^(50|51)[0-9]{11}$|^(95|97)[0-9]{11}$"))
             .put("优速快递", Pattern.compile("^VIP[0-9]{9}|V[0-9]{11}|[0-9]{12}$|^LBX[0-9]{15}-[2-9AZ]{1}-[1-9A-Z]{1}$|^(9001)[0-9]{8}$"))
-            .put("德邦快递", Pattern.compile("^[0-9]{8,10}$|^\\d{15,}[-\\d]+$"))
+            .put("德邦快递", Pattern.compile("^[0-9]{8,10}$|^\\d{15,}[-\\d]+$|^DPK\\d{11,}[-\\d]+$"))
             .put("速尔快运", Pattern.compile("^(SUR)[0-9]{12}$|^[0-9]{12}$"))
             .put("联邦快递", Pattern.compile("^[0-9]{12}$"))
             .put("华强物流", Pattern.compile("^[A-Za-z0-9]*[0|2|4|6|8]$"))
@@ -60,6 +60,7 @@ public class UDFLogisticNoValid extends UDF {
             .put("联昊通", Pattern.compile("^[0-9]{9,12}$"))
             .put("E速宝", Pattern.compile("[0-9a-zA-Z-]{5,20}"))
             .put("增益速递", Pattern.compile("^[0-9]{12,13}$"))
+            .put("极兔速递", Pattern.compile("^JT[0-9]{12,13}$"))
             .build();
 
     public UDFLogisticNoValid() {
@@ -88,15 +89,21 @@ public class UDFLogisticNoValid extends UDF {
         Matcher m = pattern.matcher(no);
         if(m.find()) {
             result.set(true);
+        } else {
+            logger.warn("匹配失败，快递公司为：[{}], 单号为: [{}]", companyName, no);
         }
         return result;
     }
 
     public static void main(String[] args) {
         UDFLogisticNoValid udfLogisticNoValid = new UDFLogisticNoValid();
-//        System.out.println(udfLogisticNoValid.evaluate(new Text("中通快递"), new Text("78631990993534")));
-//        System.out.println(udfLogisticNoValid.evaluate(new Text("申通快递"), new Text("432929137000817")));
-//        System.out.println(udfLogisticNoValid.evaluate(new Text("韵达快递"), new Text("432895069186308")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("圆通速递"), new Text("YT6900634716900")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("中通快递"), new Text("78636098066239")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("申通快递"), new Text("773194917396313")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("韵达快递"), new Text("5301156237108")));
 //        System.out.println(udfLogisticNoValid.evaluate(new Text("邮政快递包裹"), new Text("432895069186308")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("邮政快递包裹"), new Text("9889510569807")));
+//        System.out.println(udfLogisticNoValid.evaluate(new Text("极兔速递"), new Text("JT0006968326954")));
+        System.out.println(udfLogisticNoValid.evaluate(new Text("德邦快递"), new Text("DPK364112047425")));
     }
 }
