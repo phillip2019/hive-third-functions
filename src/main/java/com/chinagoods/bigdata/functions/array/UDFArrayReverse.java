@@ -18,10 +18,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.*;
         , value = "_FUNC_(array) - reverse the array element."
         , extended = "Example:\n > select _FUNC_(array) from src;")
 public class UDFArrayReverse extends GenericUDF {
-    /**
-     * Number of arguments to this UDF
-     **/
-    private static final int ARG_COUNT = 1;
+    private static final int ARG_COUNT = 1; // Number of arguments to this UDF
     private transient ListObjectInspector arrayOI;
     private transient ObjectInspector arrayElementOI;
 

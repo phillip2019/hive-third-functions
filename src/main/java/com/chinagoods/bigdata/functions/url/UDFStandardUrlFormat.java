@@ -94,16 +94,36 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private static final String PARAM_SEPARATOR = "&";
     private static final String EQ = "=";
     private static final String COMMA = ",";
-
     /**
      * 固定参数
      */
     private static final String T = "T--";
-    private static final String Z = "Z--";
-    private static final String M = "M--";
-    private static final String S = "S--";
+    /*导航菜单商品分类中的分类编码*/
     private static final String C = "C--";
-    private static final String IMT = "IMT--0";
+    /*导航菜单市场区块中的市场编码*/
+    private static final String Z = "Z--";
+    /*导航菜单商品分类中的市场编码*/
+    private static final String M = "M--";
+    /*商品列表实力商家筛选按钮*/
+    private static final String EY = "EY--";
+    /*商品列表甄选商家筛选按钮*/
+    private static final String VL = "VL--";
+    /*商品列表生产厂家筛选按钮*/
+    private static final String SF = "SF--";
+    /*指定的市场id*/
+    private static final String LT = "LT--";
+    /*商品列表综合，销售、价格、最新、有视频排序按钮*/
+    private static final String S = "S--";
+    private static final String IMT = "IMT--";
+    /*商品列表当前页数*/
+    private static final String P = "P--";
+    /*商品列表当前页条数*/
+    private static final String I = "I--";
+    /*商品列表当前页条数*/
+    private static final String HR = "HR--";
+    /*是否展开全部*/
+    private static final String EP = "EP--";
+
     private static final String STANDARD_ZERO = "0000";
     private static final String H5 = "h5";
     private static final String FIXED_PARAM = "fixed_param";
@@ -134,10 +154,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-//        Long start0 = System.currentTimeMillis();
         initRules();
-//        Long end0 = System.currentTimeMillis();
-//        logger.info("init times {} ms", (end0 - start0));
         return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
     }
 
@@ -170,22 +187,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
                 }
             }
         }
-//        Long start1 = System.currentTimeMillis();
         meunDealUrl(scUrl);
-//        Long end1 = System.currentTimeMillis();
-//        logger.info("Dynamically generating menu urls takes time {} ms", end1 - start1);
-
-//        Long start2 = System.currentTimeMillis();
         resultPageNameList = specialParamDealUrl(scUrl);
-//        Long end2 = System.currentTimeMillis();
-//        logger.info("It takes time to match the special URL list {} ms", end2 - start2);
-
-//        Long start3 = System.currentTimeMillis();
         if (resultPageNameList.get(0).toString().equals(STANDARD_ZERO)) {
             resultPageNameList = regexDealUrl(scUrl);
         }
-//        Long end3 = System.currentTimeMillis();
-//        logger.info("Matching the official rule list takes time {} ms", end3 - start3);
         return resultPageNameList;
     }
 
@@ -274,38 +280,42 @@ public class UDFStandardUrlFormat extends GenericUDF {
                         String paramUrl = scUrl.substring(indexStart, indexEnd).toLowerCase();
                         if (paramUrl.contains(SEPARATOR)) {
                             List<String> nameList = new ArrayList<>();
-                            //search搜索存在搜索后赛选的情况，给固定格式
+                            //search搜索存在搜索后筛选的情况，给固定格式
                             if (paramUrl.contains(BACKSLASH)) {
-                                nameList.add(paramUrl.substring(0, paramUrl.indexOf(BACKSLASH) - 1));
+                                nameList.add(paramUrl.substring(0, paramUrl.indexOf(BACKSLASH)));
                                 paramUrl = paramUrl.substring(paramUrl.indexOf(BACKSLASH) + 1, paramUrl.length());
                             }
                             String[] keysArr = paramUrl.split(SEPARATOR);
                             for (String key : keysArr) {
-                                if (!key.equals(IMT.toLowerCase())) {
-                                    if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(multipleUrl)){
-                                        String mOrC=key.split(KV_SEPARATOR)[0];
-                                        String value=EMPTY;
-                                        if(key.contains(C.toLowerCase())){
-                                            value=key.replace(C.toLowerCase(),EMPTY);
-                                        }
-                                        if(key.contains(M.toLowerCase())){
-                                            value=key.replace(M.toLowerCase(),EMPTY);
-                                        }
-                                        if(value.contains(KV_VALUE_SEPARATOR)){
-                                            String[]arr=value.split(KV_VALUE_SEPARATOR);
-                                            if(arr!=null && arr.length>0) {
-                                                for (String v : arr) {
-                                                    String res=paramKvMap.get(mOrC + KV_SEPARATOR + v);
-                                                    if(StringUtils.isNotBlank(res)){
-                                                        nameList.add(res);
-                                                    }
+                                String upKey=key.toUpperCase();
+                                if(upKey.contains(EY) || upKey.contains(VL) || upKey.contains(SF) || upKey.contains(LT)
+                                    || upKey.contains(S) || upKey.contains(IMT) || upKey.contains(P) || upKey.contains(I)
+                                    || upKey.contains(HR) || upKey.contains(EP)){
+                                    continue;
+                                }
+                                if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(multipleUrl)){
+                                    String mOrC=key.split(KV_SEPARATOR)[0];
+                                    String value=EMPTY;
+                                    if(key.contains(C.toLowerCase())){
+                                        value=key.replace(C.toLowerCase(),EMPTY);
+                                    }
+                                    if(key.contains(M.toLowerCase())){
+                                        value=key.replace(M.toLowerCase(),EMPTY);
+                                    }
+                                    if(value.contains(KV_VALUE_SEPARATOR)){
+                                        String[]arr=value.split(KV_VALUE_SEPARATOR);
+                                        if(arr!=null && arr.length>0) {
+                                            for (String v : arr) {
+                                                String res=paramKvMap.get(mOrC + KV_SEPARATOR + v);
+                                                if(StringUtils.isNotBlank(res)){
+                                                    nameList.add(res);
                                                 }
                                             }
-                                            continue;
                                         }
+                                        continue;
                                     }
-                                    nameList.add(paramKvMap.get(key));
                                 }
+                                nameList.add(paramKvMap.get(key));
                             }
                             pageName = String.join(SEPARATOR, nameList);
                         } else {
