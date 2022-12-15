@@ -10,6 +10,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.serde2.objectinspector.*;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static com.chinagoods.bigdata.functions.utils.ArrayUtils.IntArrayCompare;
@@ -96,12 +97,16 @@ public class UDTFArrayAroundCross extends GenericUDTF {
         Object leftArrayElement;
         Object rightArrayElement;
 
+
+        ArrayList<Object> tuple2Arr;
         for (int i = 0; i < srcArrayLength; i++) {
             leftArrayElement = arrayOi.getListElement(srcArray, leftPositions[i]);
             for (int j = i + 1; j < srcArrayLength; j++) {
+                tuple2Arr = new ArrayList<>(2);
                 rightArrayElement = arrayOi.getListElement(srcArray, leftPositions[j]);
-                forward(converter.convert(leftArrayElement));
-                forward(converter.convert(rightArrayElement));
+                tuple2Arr.add(converter.convert(leftArrayElement));
+                tuple2Arr.add(converter.convert(rightArrayElement));
+                forward(tuple2Arr);
             }
         }
     }
