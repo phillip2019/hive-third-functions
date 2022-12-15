@@ -6,11 +6,11 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.serde2.objectinspector.*;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.chinagoods.bigdata.functions.utils.ArrayUtils.IntArrayCompare;
 
@@ -22,7 +22,7 @@ import static com.chinagoods.bigdata.functions.utils.ArrayUtils.IntArrayCompare;
 @Description(name = "array_around_cross"
         , value = "_FUNC_(array) - Returns the cartesian product function in a collection."
         , extended = "Example:\n > select _FUNC_(array) from src;")
-public class UDFArrayAroundCross extends GenericUDF {
+public class UDTFArrayAroundCross extends GenericUDTF {
     private static final int INITIAL_SIZE = 128;
     /**
      * Number of arguments to this UDF
@@ -31,16 +31,14 @@ public class UDFArrayAroundCross extends GenericUDF {
     private int[] leftPositions = new int[INITIAL_SIZE];
     private transient ListObjectInspector arrayOi;
     private transient ObjectInspector arrayElementOi;
-    private transient ObjectInspector targetArrayElementOi;
 
-    private transient ArrayList<ArrayList<Object>> result = new ArrayList<>();
     private transient Converter converter;
 
-    public UDFArrayAroundCross() {
+    public UDTFArrayAroundCross() {
     }
 
     @Override
-    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+    public StructObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         // Check if two arguments were passed
         if (arguments.length != ARG_COUNT) {
             throw new UDFArgumentLengthException(
@@ -59,24 +57,30 @@ public class UDFArrayAroundCross extends GenericUDF {
         }
         arrayOi = (ListObjectInspector) arguments[0];
         arrayElementOi = arrayOi.getListElementObjectInspector();
-        targetArrayElementOi = ObjectInspectorFactory.getStandardListObjectInspector(arrayElementOi);
         converter = ObjectInspectorConverters.getConverter(arrayElementOi, arrayElementOi);
-        return ObjectInspectorFactory.getStandardListObjectInspector(targetArrayElementOi);
+
+        // 有2列，col1、col2
+        return ObjectInspectorFactory.getStandardStructObjectInspector(
+                Arrays.asList("col1", "col2"),
+                Arrays.asList(arrayOi.getListElementObjectInspector()
+                        ,arrayOi.getListElementObjectInspector()
+                )
+        );
     }
 
     @Override
-    public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        Object srcArray = arguments[0].get();
+    public void process(Object[] arguments) throws HiveException {
+        Object srcArray = arguments[0];
         int srcArrayLength = arrayOi.getListLength(srcArray);
 
         // Check if array is null or empty
         if (srcArray == null || srcArrayLength < 0) {
-            return null;
+            return;
         }
 
         // 若原始内容小于等于1，则返回null
         if (srcArrayLength <= 1) {
-            return null;
+            return;
         }
 
         if (leftPositions.length < srcArrayLength) {
@@ -89,25 +93,24 @@ public class UDFArrayAroundCross extends GenericUDF {
 
         IntArrays.quickSort(leftPositions, 0, srcArrayLength, IntArrayCompare(srcArray, arrayOi));
 
-        ArrayList<Object> tuple2Arr;
         Object leftArrayElement;
         Object rightArrayElement;
 
-        result.clear();
         for (int i = 0; i < srcArrayLength; i++) {
             leftArrayElement = arrayOi.getListElement(srcArray, leftPositions[i]);
             for (int j = i + 1; j < srcArrayLength; j++) {
-                tuple2Arr = new ArrayList<>(2);
                 rightArrayElement = arrayOi.getListElement(srcArray, leftPositions[j]);
-                tuple2Arr.add(converter.convert(leftArrayElement));
-                tuple2Arr.add(converter.convert(rightArrayElement));
-                result.add(tuple2Arr);
+                forward(converter.convert(leftArrayElement));
+                forward(converter.convert(rightArrayElement));
             }
         }
-        return result;
     }
 
     @Override
+    public void close() throws HiveException {
+
+    }
+
     public String getDisplayString(String[] strings) {
         assert (strings.length == ARG_COUNT);
         return "array_around_cross(" + strings[0] + ")";
