@@ -29,9 +29,9 @@ public class UDFArrayAroundCross extends GenericUDF {
      **/
     private static final int ARG_COUNT = 1;
     private int[] leftPositions = new int[INITIAL_SIZE];
-    private transient ListObjectInspector arrayOI;
-    private transient ObjectInspector arrayElementOI;
-    private transient ObjectInspector targetArrayElementOI;
+    private transient ListObjectInspector arrayOi;
+    private transient ObjectInspector arrayElementOi;
+    private transient ObjectInspector targetArrayElementOi;
 
     private transient ArrayList<ArrayList<Object>> result = new ArrayList<>();
     private transient Converter converter;
@@ -57,17 +57,17 @@ public class UDFArrayAroundCross extends GenericUDF {
                                 + "is found");
             }
         }
-        arrayOI = (ListObjectInspector) arguments[0];
-        arrayElementOI = arrayOI.getListElementObjectInspector();
-        targetArrayElementOI = ObjectInspectorFactory.getStandardListObjectInspector(arrayElementOI);
-        converter = ObjectInspectorConverters.getConverter(arrayElementOI, arrayElementOI);
-        return ObjectInspectorFactory.getStandardListObjectInspector(targetArrayElementOI);
+        arrayOi = (ListObjectInspector) arguments[0];
+        arrayElementOi = arrayOi.getListElementObjectInspector();
+        targetArrayElementOi = ObjectInspectorFactory.getStandardListObjectInspector(arrayElementOi);
+        converter = ObjectInspectorConverters.getConverter(arrayElementOi, arrayElementOi);
+        return ObjectInspectorFactory.getStandardListObjectInspector(targetArrayElementOi);
     }
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
         Object srcArray = arguments[0].get();
-        int srcArrayLength = arrayOI.getListLength(srcArray);
+        int srcArrayLength = arrayOi.getListLength(srcArray);
 
         // Check if array is null or empty
         if (srcArray == null || srcArrayLength < 0) {
@@ -87,18 +87,18 @@ public class UDFArrayAroundCross extends GenericUDF {
             leftPositions[i] = i;
         }
 
-        IntArrays.quickSort(leftPositions, 0, srcArrayLength, IntArrayCompare(srcArray, arrayOI));
-
-        result.clear();
+        IntArrays.quickSort(leftPositions, 0, srcArrayLength, IntArrayCompare(srcArray, arrayOi));
 
         ArrayList<Object> tuple2Arr;
         Object leftArrayElement;
         Object rightArrayElement;
+
+        result.clear();
         for (int i = 0; i < srcArrayLength; i++) {
-            leftArrayElement = arrayOI.getListElement(srcArray, i);
+            leftArrayElement = arrayOi.getListElement(srcArray, leftPositions[i]);
             for (int j = i + 1; j < srcArrayLength; j++) {
                 tuple2Arr = new ArrayList<>(2);
-                rightArrayElement = arrayOI.getListElement(srcArray, j);
+                rightArrayElement = arrayOi.getListElement(srcArray, leftPositions[j]);
                 tuple2Arr.add(converter.convert(leftArrayElement));
                 tuple2Arr.add(converter.convert(rightArrayElement));
                 result.add(tuple2Arr);

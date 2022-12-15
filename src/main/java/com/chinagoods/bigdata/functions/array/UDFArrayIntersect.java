@@ -27,10 +27,10 @@ public class UDFArrayIntersect extends GenericUDF {
     private static final int ARG_COUNT = 2; // Number of arguments to this UDF
     private int[] leftPositions = new int[INITIAL_SIZE];
     private int[] rightPositions = new int[INITIAL_SIZE];
-    private transient ListObjectInspector leftArrayOI;
-    private transient ListObjectInspector rightArrayOI;
-    private transient ObjectInspector leftArrayElementOI;
-    private transient ObjectInspector rightArrayElementOI;
+    private transient ListObjectInspector leftArrayOi;
+    private transient ListObjectInspector rightArrayOi;
+    private transient ObjectInspector leftArrayElementOi;
+    private transient ObjectInspector rightArrayElementOi;
 
     private transient ArrayList<Object> result = new ArrayList<Object>();
     private transient Converter converter;
@@ -57,32 +57,32 @@ public class UDFArrayIntersect extends GenericUDF {
             }
         }
 
-        leftArrayOI = (ListObjectInspector) arguments[0];
-        rightArrayOI = (ListObjectInspector) arguments[1];
+        leftArrayOi = (ListObjectInspector) arguments[0];
+        rightArrayOi = (ListObjectInspector) arguments[1];
 
-        leftArrayElementOI = leftArrayOI.getListElementObjectInspector();
-        rightArrayElementOI = rightArrayOI.getListElementObjectInspector();
+        leftArrayElementOi = leftArrayOi.getListElementObjectInspector();
+        rightArrayElementOi = rightArrayOi.getListElementObjectInspector();
 
         // Check if two array are of same type
-        if (!ObjectInspectorUtils.compareTypes(leftArrayElementOI, rightArrayElementOI)) {
+        if (!ObjectInspectorUtils.compareTypes(leftArrayElementOi, rightArrayElementOi)) {
             throw new UDFArgumentTypeException(1,
-                    "\"" + leftArrayElementOI.getTypeName() + "\""
+                    "\"" + leftArrayElementOi.getTypeName() + "\""
                             + " expected at function array_intersect, but "
-                            + "\"" + rightArrayElementOI.getTypeName() + "\""
+                            + "\"" + rightArrayElementOi.getTypeName() + "\""
                             + " is found");
         }
 
         // Check if the comparison is supported for this type
-        if (!ObjectInspectorUtils.compareSupported(leftArrayElementOI)) {
+        if (!ObjectInspectorUtils.compareSupported(leftArrayElementOi)) {
             throw new UDFArgumentException("The function array_intersect"
                     + " does not support comparison for "
-                    + "\"" + leftArrayElementOI.getTypeName() + "\""
+                    + "\"" + leftArrayElementOi.getTypeName() + "\""
                     + " types");
         }
 
-        converter = ObjectInspectorConverters.getConverter(leftArrayElementOI, leftArrayElementOI);
+        converter = ObjectInspectorConverters.getConverter(leftArrayElementOi, leftArrayElementOi);
 
-        return ObjectInspectorFactory.getStandardListObjectInspector(leftArrayElementOI);
+        return ObjectInspectorFactory.getStandardListObjectInspector(leftArrayElementOi);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class UDFArrayIntersect extends GenericUDF {
         Object leftArray = arguments[0].get();
         Object rightArray = arguments[1].get();
 
-        int leftArrayLength = leftArrayOI.getListLength(leftArray);
-        int rightArrayLength = rightArrayOI.getListLength(rightArray);
+        int leftArrayLength = leftArrayOi.getListLength(leftArray);
+        int rightArrayLength = rightArrayOi.getListLength(rightArray);
 
         // Check if array is null or empty
         if (leftArray == null || rightArray == null || leftArrayLength < 0 || rightArrayLength < 0) {
@@ -120,34 +120,32 @@ public class UDFArrayIntersect extends GenericUDF {
             rightPositions[i] = i;
         }
 
-        IntArrays.quickSort(leftPositions, 0, leftArrayLength, IntArrayCompare(leftArray, leftArrayOI));
-        IntArrays.quickSort(rightPositions, 0, rightArrayLength, IntArrayCompare(rightArray, rightArrayOI));
+        IntArrays.quickSort(leftPositions, 0, leftArrayLength, IntArrayCompare(leftArray, leftArrayOi));
+        IntArrays.quickSort(rightPositions, 0, rightArrayLength, IntArrayCompare(rightArray, rightArrayOi));
 
         result.clear();
-        int leftCurrentPosition = 0;
-        int rightCurrentPosition = 0;
-        int leftBasePosition;
-        int rightBasePosition;
+        int leftCurrentPosition = 0, rightCurrentPosition = 0;
+        int leftBasePosition = 0, rightBasePosition = 0;
 
         while (leftCurrentPosition < leftArrayLength && rightCurrentPosition < rightArrayLength) {
             leftBasePosition = leftCurrentPosition;
             rightBasePosition = rightCurrentPosition;
-            Object leftArrayElement = leftArrayOI.getListElement(leftArray, leftPositions[leftCurrentPosition]);
-            Object rightArrayElement = rightArrayOI.getListElement(rightArray, rightPositions[rightCurrentPosition]);
-            int compareValue = ObjectInspectorUtils.compare(leftArrayElement, leftArrayElementOI, rightArrayElement, rightArrayElementOI);
+            Object leftArrayElement = leftArrayOi.getListElement(leftArray, leftPositions[leftCurrentPosition]);
+            Object rightArrayElement = rightArrayOi.getListElement(rightArray, rightPositions[rightCurrentPosition]);
+            int compareValue = ObjectInspectorUtils.compare(leftArrayElement, leftArrayElementOi, rightArrayElement, rightArrayElementOi);
             if (compareValue > 0) {
                 rightCurrentPosition++;
             } else if (compareValue < 0) {
                 leftCurrentPosition++;
             } else {
-                result.add(converter.convert(leftArrayOI.getListElement(leftArray, leftPositions[leftCurrentPosition])));
+                result.add(converter.convert(leftArrayOi.getListElement(leftArray, leftPositions[leftCurrentPosition])));
                 leftCurrentPosition++;
                 rightCurrentPosition++;
 
-                while (leftCurrentPosition < leftArrayLength && compare(leftArrayOI, leftArray, leftBasePosition, leftCurrentPosition) == 0) {
+                while (leftCurrentPosition < leftArrayLength && compare(leftArrayOi, leftArray, leftPositions[leftBasePosition], leftPositions[leftCurrentPosition]) == 0) {
                     leftCurrentPosition++;
                 }
-                while (rightCurrentPosition < rightArrayLength && compare(rightArrayOI, rightArray, rightBasePosition, rightCurrentPosition) == 0) {
+                while (rightCurrentPosition < rightArrayLength && compare(rightArrayOi, rightArray, rightPositions[rightBasePosition], rightPositions[rightCurrentPosition]) == 0) {
                     rightCurrentPosition++;
                 }
             }
@@ -156,11 +154,11 @@ public class UDFArrayIntersect extends GenericUDF {
         return result;
     }
 
-    private int compare(ListObjectInspector arrayOI, Object array, int position1, int position2) {
-        ObjectInspector arrayElementOI = arrayOI.getListElementObjectInspector();
-        Object arrayElementTmp1 = arrayOI.getListElement(array, position1);
-        Object arrayElementTmp2 = arrayOI.getListElement(array, position2);
-        return ObjectInspectorUtils.compare(arrayElementTmp1, arrayElementOI, arrayElementTmp2, arrayElementOI);
+    private int compare(ListObjectInspector arrayOi, Object array, int position1, int position2) {
+        ObjectInspector arrayElementOi = arrayOi.getListElementObjectInspector();
+        Object arrayElementTmp1 = arrayOi.getListElement(array, position1);
+        Object arrayElementTmp2 = arrayOi.getListElement(array, position2);
+        return ObjectInspectorUtils.compare(arrayElementTmp1, arrayElementOi, arrayElementTmp2, arrayElementOi);
     }
 
     @Override
