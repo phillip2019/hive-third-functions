@@ -63,8 +63,8 @@ public class UDTFArrayAroundCross extends GenericUDTF {
         // 有2列，col1、col2
         return ObjectInspectorFactory.getStandardStructObjectInspector(
                 Arrays.asList("col1", "col2"),
-                Arrays.asList(arrayOi.getListElementObjectInspector()
-                        ,arrayOi.getListElementObjectInspector()
+                Arrays.asList(arrayElementOi
+                        ,arrayElementOi
                 )
         );
     }
@@ -104,8 +104,8 @@ public class UDTFArrayAroundCross extends GenericUDTF {
             for (int j = i + 1; j < srcArrayLength; j++) {
                 tuple2Arr = new ArrayList<>(2);
                 rightArrayElement = arrayOi.getListElement(srcArray, leftPositions[j]);
-                tuple2Arr.add(converter.convert(leftArrayElement));
-                tuple2Arr.add(converter.convert(rightArrayElement));
+                tuple2Arr.add(leftArrayElement);
+                tuple2Arr.add(rightArrayElement);
                 forward(tuple2Arr);
             }
         }
