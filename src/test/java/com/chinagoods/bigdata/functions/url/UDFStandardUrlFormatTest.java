@@ -18,25 +18,24 @@ import java.util.regex.Pattern;
 
 public class UDFStandardUrlFormatTest {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
-    private static final String DB_URL = "jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false";
-    private static final String DB_USER = "datax";
-    private static final String DB_PASSWORD = "oRvmRrVJeOCl8XsY";
-
+    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_USER = "source";
+    private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
 
     @Test
     public void testUrlEncode() throws Exception {
-        UDFStandardUrlFormat udf = new UDFStandardUrlFormat();
-        ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-        ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-        ObjectInspector[] arguments = {platform_type, sc_url};
-        udf.initialize(arguments);
-
-        ArrayList<Text> reslist = null;
-        GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("pc");
-        GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("https://news.chinagoods.com/information/11/search/减免租金");
-        GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
-        reslist = udf.evaluate(args);
-        System.out.println(reslist);
+//        UDFStandardUrlFormat udf = new UDFStandardUrlFormat();
+//        ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+//        ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+//        ObjectInspector[] arguments = {platform_type, sc_url};
+//        udf.initialize(arguments);
+//
+//        ArrayList<Text> reslist = null;
+//        GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("pc");
+//        GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("https://news.chinagoods.com/information/11/search/减免租金");
+//        GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
+//        reslist = udf.evaluate(args);
+//        System.out.println(reslist);
 
 //        String RULE_SQL = "select platform_type,sc_url from test2 where" +
 //                 " sc_url not like 'http://localhost%' " +
