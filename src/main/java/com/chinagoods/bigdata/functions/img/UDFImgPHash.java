@@ -1,9 +1,6 @@
 package com.chinagoods.bigdata.functions.img;
 
 import com.chinagoods.bigdata.functions.utils.img.PHash;
-import com.chinagoods.bigdata.functions.utils.img.domain.CImage;
-import com.chinagoods.bigdata.functions.utils.img.domain.Digest;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -15,11 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * Created by xiaowei.song on 17/3/23.
