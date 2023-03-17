@@ -6,9 +6,12 @@ import com.chinagoods.bigdata.functions.utils.img.domain.Digest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.io.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +28,14 @@ import java.util.Arrays;
         , value = "_FUNC_(string) - get phash code by given input img url."
         , extended = "Example:\n > select _FUNC_(string) from src;")
 public class UDFImgPHash extends UDF {
+
+    public static final Logger logger = LoggerFactory.getLogger(UDFImgPHash.class);
+
     private Text result = new Text();
-    private PHash phash = new PHash();
-//    public static final String DOWNLOAD_IMG_DIR = "e:\\phash";
-    public static final String DOWNLOAD_IMG_DIR = "/tmp/phash";
-    public static final Integer N = 180;
+    public static final String DOWNLOAD_IMG_DIR = "e:\\phash";
+//    public static final String DOWNLOAD_IMG_DIR = "/tmp/phash";
+
+    public static final String DEFAULT_FEATURE_CODE = "0000";
 
 
     public UDFImgPHash() throws IOException {
@@ -53,17 +59,24 @@ public class UDFImgPHash extends UDF {
         File imageFile = imageFilePath.toFile();
         // 下载文件到本地
         FileUtils.copyURLToFile(imageUrl, imageFile);
-        CImage imA = new CImage(imageFile);
-        Digest digest = new Digest();
-        phash.phImageDigest(imA, digest, N);
-        result.set(String.valueOf(Arrays.hashCode(digest.coeffs)));
-        // 计算完成，清理文件
-        FileUtils.forceDelete(imageFile);
+        logger.debug("本地图片路径为: {}", imageFile.toString());
+        String phashFeature;
+        try {
+            phashFeature = PHash.getFeatureValue(imageFile.toString());
+        } finally {
+            // 计算完成，清理文件
+            FileUtils.forceDelete(imageFile);
+        }
+        if (StringUtils.isNotBlank(phashFeature)) {
+            result.set(phashFeature);
+        } else {
+            result.set(DEFAULT_FEATURE_CODE);
+        }
         return result;
     }
 
     public static void main(String[] args) throws IOException {
         UDFImgPHash imgPHash = new UDFImgPHash();
-        System.out.println(imgPHash.evaluate(new Text("https://cdnimg.chinagoods.com/i004/2019/02/24/96/f4650b8ef56e89ef4ef4d7219dcf29c4.jpg")));
+        System.out.println(imgPHash.evaluate(new Text("https://cdnimg.chinagoods.com/jpg/2020/05/14/e8a0c54311b5c8b967e7bbac0ef3c3ca.jpg")));
     }
 }
