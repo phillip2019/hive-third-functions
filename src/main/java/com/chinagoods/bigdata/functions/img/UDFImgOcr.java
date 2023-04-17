@@ -134,7 +134,7 @@ public class UDFImgOcr extends UDF {
             textJn = resultsJnArr.next();
             text = textJn.path("text").asText("");
             if (StringUtils.isNotBlank(text)) {
-                sb.append(text);
+                sb.append(text).append("\n");
             }
         }
         return sb.toString();
