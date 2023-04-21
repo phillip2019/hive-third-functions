@@ -48,7 +48,7 @@ public class UDFWhisper extends UDF {
 
     static {
         Unirest.config()
-                .socketTimeout(500)
+                .socketTimeout(600000)
                 .connectTimeout(600000)
                 .concurrency(10, 5)
                 .setDefaultHeader("Accept", "application/json")
