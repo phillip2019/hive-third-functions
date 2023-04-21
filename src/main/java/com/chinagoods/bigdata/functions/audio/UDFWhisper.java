@@ -46,6 +46,17 @@ public class UDFWhisper extends UDF {
 
     public static final String IMG_OCR_URL = "http://172.18.5.14:25000/whisper";
 
+    static {
+        Unirest.config()
+                .socketTimeout(500)
+                .connectTimeout(600000)
+                .concurrency(10, 5)
+                .setDefaultHeader("Accept", "application/json")
+                .followRedirects(false)
+                .enableCookieManagement(false)
+        ;
+    }
+
     /**
      * md5 hash.
      *

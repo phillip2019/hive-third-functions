@@ -85,8 +85,8 @@ public class UDFImgOcr extends UDF {
 
     public static Map<String, Object> postAction(File f) {
         Map<String, Object> resultMap=new HashMap<>(2);
-
-        kong.unirest.HttpResponse<String> response = Unirest.post(IMG_OCR_URL)
+        kong.unirest.HttpResponse<String> response = Unirest
+                .post(IMG_OCR_URL)
                 .header("accept", "*/*")
                 .field("image", f, "image")
                 .asString();
