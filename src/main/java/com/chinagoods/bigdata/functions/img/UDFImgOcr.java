@@ -4,6 +4,7 @@ import com.chinagoods.bigdata.functions.utils.JacksonBuilder;
 import com.chinagoods.bigdata.functions.utils.img.PHash;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import kong.unirest.HttpStatus;
 import kong.unirest.Unirest;
 import org.apache.commons.io.FileUtils;
@@ -83,7 +84,7 @@ public class UDFImgOcr extends UDF {
         return result;
     }
 
-    public static Map<String, Object> postAction(File f) {
+    public static Map<String, Object> postAction(File f) throws JsonProcessingException {
         Map<String, Object> resultMap=new HashMap<>(2);
         kong.unirest.HttpResponse<String> response = Unirest
                 .post(IMG_OCR_URL)
@@ -108,7 +109,7 @@ public class UDFImgOcr extends UDF {
             logger.error("请求错误，ocr解析图片内容失败，错误为: ", e);
         }
         resultMap.put("isSuc", isSucc);
-        JsonNode rspJn = null;
+        JsonNode rspJn = JacksonBuilder.mapper.readTree("{}");
         try {
             rspJn = JacksonBuilder.mapper.readTree(content);
         } catch (JsonProcessingException e) {
