@@ -9,6 +9,7 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
@@ -25,6 +26,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 public class UDFRe2JRegexpExtractAll extends GenericUDF {
     private transient ArrayList<Object> result = new ArrayList<Object>();
     private transient Re2JRegexp re2JRegexp;
+    private ObjectInspectorConverters.Converter[] converters;
 
     public UDFRe2JRegexpExtractAll() {
 
@@ -37,7 +39,11 @@ public class UDFRe2JRegexpExtractAll extends GenericUDF {
             throw new UDFArgumentLengthException(
                     "The function regexp_extract_all takes exactly 2 or 3 arguments.");
         }
-
+        converters = new ObjectInspectorConverters.Converter[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
+                    PrimitiveObjectInspectorFactory.javaStringObjectInspector);
+        }
         for (int i = 0; i < 2; i++) {
             if (!ObjectInspectorUtils.compareTypes(PrimitiveObjectInspectorFactory.javaStringObjectInspector, arguments[i])) {
                 throw new UDFArgumentTypeException(i,
@@ -65,11 +71,11 @@ public class UDFRe2JRegexpExtractAll extends GenericUDF {
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        String source = (String) arguments[0].get();
-        String pattern = (String) arguments[1].get();
+        String source = converters[0].convert(arguments[0].get()).toString();;
+        String pattern = converters[1].convert(arguments[1].get()).toString();
         Long groupIndex = 0L;
         if (arguments.length == 3) {
-            groupIndex = (Long) arguments[2].get();
+            groupIndex = Long.parseLong(converters[2].convert(arguments[2].get()).toString());
         }
 
         if (source == null) {
