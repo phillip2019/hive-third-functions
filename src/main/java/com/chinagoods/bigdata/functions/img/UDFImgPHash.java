@@ -27,8 +27,8 @@ public class UDFImgPHash extends UDF {
     public static final Logger logger = LoggerFactory.getLogger(UDFImgPHash.class);
 
     private Text result = new Text();
-    public static final String DOWNLOAD_IMG_DIR = "e:\\phash";
-//    public static final String DOWNLOAD_IMG_DIR = "/tmp/phash";
+//    public static final String DOWNLOAD_IMG_DIR = "e:\\phash";
+    public static final String DOWNLOAD_IMG_DIR = "/tmp/phash";
 
     public static final String DEFAULT_FEATURE_CODE = "0000";
 
