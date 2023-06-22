@@ -75,8 +75,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 汇总规则
      */
-    private Map<String, List<List<String>>> allRuleMap = new HashMap<String, List<List<String>>>();
-    private Map<String, String> staticUrlMap = new HashMap<String, String>();
+    private Map<String, List<List<String>>> allRuleMap = new HashMap<>();
+    private Map<String, String> staticUrlMap = new HashMap<>();
     private ObjectInspectorConverters.Converter[] converters;
     private static final int ARG_COUNT = 2;
     private static final String HTTP_PREFIX = "http:";
@@ -86,7 +86,9 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private static final String ONE = "1";
     private static final String TWO = "2";
     private static final String EMPTY = "";
-    //约定空字符用NULL替换
+    /**
+     * 约定空字符用NULL替换
+     **/
     private static final String PARAM_NULL = "NULL";
     private static final String SEPARATOR = "---";
     private static final String KV_SEPARATOR = "--";
@@ -141,7 +143,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private String regex = null;
     private String params = null;
     private ArrayList<Text> resultPageNameList = null;
-    private String multipleUrl="search/categoryProduct";
+    public static final String MULTIPLE_URL = "search/categoryProduct";
 
     public UDFStandardUrlFormat() {
     }
@@ -165,29 +167,25 @@ public class UDFStandardUrlFormat extends GenericUDF {
     public ArrayList<Text> evaluate(DeferredObject[] arguments) throws HiveException {
         assert (arguments.length == ARG_COUNT);
         initParam();
-        String scUrl = null;
-        if (arguments == null || arguments.length < 2) {
+        String scUrl;
+        platFormType = converters[0].convert(arguments[0].get()).toString();
+        scUrl = converters[0].convert(arguments[1].get()).toString();
+        if (StringUtils.isBlank(scUrl) || StringUtils.isBlank(platFormType)) {
             return resultPageNameList;
-        } else {
-            platFormType = converters[0].convert(arguments[0].get()).toString();
-            scUrl = converters[0].convert(arguments[1].get()).toString();
-            if (StringUtils.isBlank(scUrl) || StringUtils.isBlank(platFormType)) {
-                return resultPageNameList;
-            }
-            //标准化url
-            if (scUrl.contains(HTTP_PREFIX)) {
-                scUrl = scUrl.replace(HTTP_PREFIX, HTTPS_PREFIX);
-            }
-            if (scUrl.contains(HTTPS_PREFIX)) {
-                if (scUrl.contains(CONNECTOR_SEPARATOR) && !scUrl.contains(EQ + HTTP_PREFIX) && !scUrl.contains(EQ + HTTPS_PREFIX)) {
-                    String requestUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
-                    String requestUrlParam = scUrl.substring(scUrl.indexOf(CONNECTOR_SEPARATOR), scUrl.length());
-                    scUrl = requestUrl.lastIndexOf(BACKSLASH) + 1 == requestUrl.length() ? scUrl : requestUrl + BACKSLASH + requestUrlParam;
-                } else if (scUrl.contains(CONNECTOR_SEPARATOR) && (scUrl.contains(EQ + HTTP_PREFIX) || scUrl.contains(EQ + HTTPS_PREFIX))) {
-                    scUrl = scUrl + BACKSLASH;
-                } else {
-                    scUrl = scUrl.lastIndexOf(BACKSLASH) + 1 == scUrl.length() ? scUrl : scUrl + BACKSLASH;
-                }
+        }
+        //标准化url
+        if (scUrl.contains(HTTP_PREFIX)) {
+            scUrl = scUrl.replace(HTTP_PREFIX, HTTPS_PREFIX);
+        }
+        if (scUrl.contains(HTTPS_PREFIX)) {
+            if (scUrl.contains(CONNECTOR_SEPARATOR) && !scUrl.contains(EQ + HTTP_PREFIX) && !scUrl.contains(EQ + HTTPS_PREFIX)) {
+                String requestUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
+                String requestUrlParam = scUrl.substring(scUrl.indexOf(CONNECTOR_SEPARATOR));
+                scUrl = requestUrl.lastIndexOf(BACKSLASH) + 1 == requestUrl.length() ? scUrl : requestUrl + BACKSLASH + requestUrlParam;
+            } else if (scUrl.contains(CONNECTOR_SEPARATOR) && (scUrl.contains(EQ + HTTP_PREFIX) || scUrl.contains(EQ + HTTPS_PREFIX))) {
+                scUrl = scUrl + BACKSLASH;
+            } else {
+                scUrl = scUrl.lastIndexOf(BACKSLASH) + 1 == scUrl.length() ? scUrl : scUrl + BACKSLASH;
             }
         }
         meunDealUrl(scUrl);
@@ -200,8 +198,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
 
     /**
      * 初始化规则信息
-     *
-     * @throws UDFArgumentException
+     * @throws UDFArgumentException  参数异常
      */
     public void initRules() throws UDFArgumentException {
         // 配置信息
@@ -209,7 +206,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
         try {
             paramKvMap = mysqlUtil.getMap(MENU_MAPING_SQL);
             menuUrlList = mysqlUtil.getLists(String.format(STANDARD_SPECIAL_URL_SQL, ONE));
-            mysqlUtil.getLists(RULE_SQL).stream().forEach(rules -> {
+            mysqlUtil.getLists(RULE_SQL).forEach(rules -> {
                 platFormType = rules.get(0);
                 String h5Key = rules.get(1).equals(FLAG) ? H5 : EMPTY;
                 if (allRuleMap.get(platFormType + h5Key) == null) {
@@ -296,7 +293,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                                     || upKey.contains(HR) || upKey.contains(EP)){
                                     continue;
                                 }
-                                if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(multipleUrl)){
+                                if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(MULTIPLE_URL)){
                                     String mOrC=key.split(KV_SEPARATOR)[0];
                                     String value=EMPTY;
                                     if(key.contains(C.toLowerCase())){
@@ -307,7 +304,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                                     }
                                     if(value.contains(KV_VALUE_SEPARATOR)){
                                         String[]arr=value.split(KV_VALUE_SEPARATOR);
-                                        if(arr!=null && arr.length>0) {
+                                        if(arr.length > 0) {
                                             for (String v : arr) {
                                                 String res=paramKvMap.get(mOrC + KV_SEPARATOR + v);
                                                 if(StringUtils.isNotBlank(res)){
@@ -360,42 +357,39 @@ public class UDFStandardUrlFormat extends GenericUDF {
                 return resultPageNameList;
             }
             //特殊url处理
-            if (isSpecial) {
-                for (List<String> urlList : specialUrlList) {
-                    String url = urlList.get(0);
-                    String fixedIdentity = urlList.get(1);
-                    String paramType = urlList.get(7);
-                    String pageLinkName = urlList.get(8);
-                    URL urls = new URL(scUrl);
-                    String host = urls.getHost();
-                    if (scUrl.contains(fixedIdentity) && url.contains(host)) {
-                        if (paramType.equals(ONE)) {
-                            String urlParamKeys = urlList.get(6);
-                            if (StringUtils.isNotBlank(urlParamKeys)) {
-                                String[] urlParamKeysArray = urlParamKeys.split(COMMA);
-                                Map<String, List<String>> map = getUrlparameter(scUrl, urlParamKeysArray);
-                                map.forEach((k, v) -> {
-                                    standardUrl = String.join(CONNECTOR_SEPARATOR, k, String.join(PARAM_SEPARATOR, v));
-                                });
-                            }else if(!url.contains(CONNECTOR_SEPARATOR)){
-                                standardUrl = scUrl.substring(0,scUrl.indexOf(CONNECTOR_SEPARATOR));
-                            }
-                        } else if (paramType.equals(TWO)) {
-                            if (!url.contains(CONNECTOR_SEPARATOR)) {
-                                standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
-                            }
+            for (List<String> urlList : specialUrlList) {
+                String url = urlList.get(0);
+                String fixedIdentity = urlList.get(1);
+                String paramType = urlList.get(7);
+                String pageLinkName = urlList.get(8);
+                URL urls = new URL(scUrl);
+                String host = urls.getHost();
+                if (scUrl.contains(fixedIdentity) && url.contains(host)) {
+                    if (paramType.equals(ONE)) {
+                        String urlParamKeys = urlList.get(6);
+                        if (StringUtils.isNotBlank(urlParamKeys)) {
+                            String[] urlParamKeysArray = urlParamKeys.split(COMMA);
+                            Map<String, List<String>> map = getUrlParameter(scUrl, urlParamKeysArray);
+                            map.forEach((k, v) -> {
+                                standardUrl = String.join(CONNECTOR_SEPARATOR, k, String.join(PARAM_SEPARATOR, v));
+                            });
+                        }else if(!url.contains(CONNECTOR_SEPARATOR)){
+                            standardUrl = scUrl.substring(0,scUrl.indexOf(CONNECTOR_SEPARATOR));
                         }
-                        if (StringUtils.isBlank(standardUrl)) {
-                            standardUrl = scUrl;
-                        }
-                        if (StringUtils.isNotBlank(standardUrl)) {
-                            //静态url获取三级名称
-                            getStaticUrl(standardUrl, pageLinkName);
-                            return resultPageNameList;
+                    } else if (paramType.equals(TWO)) {
+                        if (!url.contains(CONNECTOR_SEPARATOR)) {
+                            standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
                         }
                     }
+                    if (StringUtils.isBlank(standardUrl)) {
+                        standardUrl = scUrl;
+                    }
+                    if (StringUtils.isNotBlank(standardUrl)) {
+                        //静态url获取三级名称
+                        getStaticUrl(standardUrl, pageLinkName);
+                        return resultPageNameList;
+                    }
                 }
-
             }
 
         } catch (Exception e) {
@@ -451,7 +445,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 从静态url中获取pagename
      *
-     * @param standardUrl
+     * @param standardUrl 标准url
+     * @param pageLinkName 页面链接名称
      */
     public void getStaticUrl(String standardUrl, String pageLinkName) {
         String pageSeparatorName = staticUrlMap.get(standardUrl.toLowerCase());
@@ -482,10 +477,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 返回结果赋值
      *
-     * @param standardUrl
-     * @param unit
-     * @param subUnit
-     * @param pageName
+     * @param standardUrl 标准url
+     * @param unit 一级模块
+     * @param subUnit 二级模块
+     * @param pageName 页面名称
+     * @param pageLinkName 页面链接名
      * @return
      */
     public void setListValue(String standardUrl, String unit, String subUnit, String pageName, String pageLinkName) {
@@ -501,7 +497,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * url转小写获取
      *
-     * @param map
+     * @param map 更新字典
      * @return
      */
     public void toLowerMap(Map<String, String> map) {
@@ -516,22 +512,28 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 提取URL指定参数和请求域名
      *
-     * @param url
-     * @param keyArr
+     * @param url 请求地址
+     * @param keyArr 参数数组
      * @return
      */
-    public static Map<String, List<String>> getUrlparameter(String url, String[] keyArr) {
-        List<String> list = new ArrayList<>();
+    public static Map<String, List<String>> getUrlParameter(String url, String[] keyArr) {
+        List<String> list = new ArrayList<>(4);
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         String domainUrl = null;
         if (StringUtils.isNotBlank(url) && keyArr.length > 0) {
             domainUrl = url.substring(0, url.indexOf(CONNECTOR_SEPARATOR));
-            for (int i = 0; i < keyArr.length; i++) {
-                Pattern pattern = Pattern.compile(keyArr[i] + "=([^&]*)");
+            for (String key : keyArr) {
+                Pattern pattern = Pattern.compile(key + "=([^&]*)");
                 Matcher matcher = pattern.matcher(url);
                 if (matcher.find()) {
-                    String value = matcher.group(0).split("=")[1].replace(PARAM_SEPARATOR, EMPTY) == null ? null : matcher.group(0).split("=")[1].replace(PARAM_SEPARATOR, EMPTY);
-                    list.add(keyArr[i] + EQ + value);
+                    // 提取关键字和关键字值
+                    String keyVal = matcher.group(0);
+                    String[] keyValArr = keyVal.split("=");
+                    String value = "";
+                    if (keyValArr.length == 2) {
+                        value = keyValArr[1].replace(PARAM_SEPARATOR, EMPTY);
+                    }
+                    list.add(key + EQ + value);
                 }
             }
         }
@@ -543,5 +545,20 @@ public class UDFStandardUrlFormat extends GenericUDF {
     public String getDisplayString(String[] strings) {
         assert (strings.length == ARG_COUNT);
         return "standard_url_format(" + strings[0] + ", " + strings[1] + ")";
+    }
+
+    public static void main(String[] args) throws HiveException {
+        String url = "https://www.chinagoods.com/activies/special/?code=";
+        UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat();
+        DeferredObject[] deferredObjects = new DeferredObject[2];
+        // 平台类型、sc_url
+        deferredObjects[0] = new DeferredJavaObject("pc");
+        deferredObjects[1] = new DeferredJavaObject(url);
+        ObjectInspector[] inspectorArr = new ObjectInspector[2];
+        inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        inspectorArr[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        urlFormat.initialize(inspectorArr);
+        ArrayList<Text> retArr = urlFormat.evaluate(deferredObjects);
+        System.out.println(retArr);
     }
 }
