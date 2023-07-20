@@ -205,6 +205,9 @@ Now, I had already release `hive-third-functions` to maven repositories. To add 
 |regexp_replace(string, pattern) -> varchar | Removes every instance of the substring matched by the regular expression pattern from string.|
 |regexp_replace(string, pattern, replacement) -> varchar | Replaces every instance of the substring matched by the regular expression pattern in string with replacement. |
 
+### 12. parse functions
+|parse_user_agent(string) -> array(varchar) | Parses the user agent and returns an ArrayList<Text> containing device_family, os_family, os_minor, os_major, user_agent_minor, and user_agent_major.|
+
 ## Use
 
 Put these statements into `${HOME}/.hiverc` or exec its on hive cli env.
@@ -291,6 +294,9 @@ create temporary function regexp_like as 'UDFRe2JRegexpLike';
 create temporary function regexp_replace as 'UDFRe2JRegexpReplace';
 create temporary function regexp_split as 'UDFRe2JRegexpSplit';
 create temporary function standard_url_format as 'UDFStandardUrlFormat';
+create temporary function parse_user_agent as 'UDFParseUserAgent';
+
+
 ```
 
 You can use these statements on hive cli env get detail of function.
@@ -397,4 +403,8 @@ select standard_url_format('wap','https://m.chinagoods.com/en/venue?id=14&dsds=d
 
 ```
 select cosine_similarity(map_build(array['a'], array[1.0]), map_build(array['a'], array[2.0])); => 1.0
+```
+
+```
+select parse_user_agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36') => [Mac, Mac OS X, 15, 10, 0, 69]
 ```
