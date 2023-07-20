@@ -143,7 +143,7 @@ public class UDFParseUserAgent  extends GenericUDF {
         UDFParseUserAgent urlFormat = new UDFParseUserAgent();
         DeferredObject[] deferredObjects = new DeferredObject[2];
         // 平台类型、sc_url
-        deferredObjects[0] = new DeferredJavaObject("ss");
+        deferredObjects[0] = new DeferredJavaObject("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
         ObjectInspector[] inspectorArr = new ObjectInspector[1];
         inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         urlFormat.initialize(inspectorArr);
