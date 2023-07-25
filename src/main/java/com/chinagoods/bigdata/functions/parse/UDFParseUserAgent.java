@@ -56,7 +56,7 @@ public class UDFParseUserAgent  extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-        return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
+        return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.writableStringObjectInspector);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class UDFParseUserAgent  extends GenericUDF {
                     deviceModel.set(uaOsDeviceFmParams[1]);
                 }
                 osVersion.set(uaArr[2]);
-                logger.info("当前uaArr: {}", uaArr[2]);
+                logger.debug("当前uaArr: {}", uaArr[2]);
                 osVersionName.set(uaArr[2].split("\\.", 2)[0]);
                 deviceModel.set("IPhone");
             }
