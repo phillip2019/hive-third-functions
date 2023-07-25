@@ -17,6 +17,7 @@ import ua_parser.Device;
 import ua_parser.Parser;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,7 +41,6 @@ public class UDFParseUserAgent  extends GenericUDF {
     public static final String SEMICOLON_SEP = ";";
     public static final String UNKNOWN_STR = "unknown";
     private Parser uaParser = new Parser();
-    public ArrayList<Text> result = new ArrayList<>(RET_ARRAY_SIZE);
     private ObjectInspectorConverters.Converter[] converters;
 
     public UDFParseUserAgent() {}
@@ -56,41 +56,41 @@ public class UDFParseUserAgent  extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-        return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+        return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
     }
 
     @Override
-    public ArrayList<Text> evaluate(DeferredObject[] arguments) throws HiveException {
+    public ArrayList<String> evaluate(DeferredObject[] arguments) throws HiveException {
+        ArrayList<String> result = new ArrayList<>(RET_ARRAY_SIZE);
         assert (arguments.length == ARG_COUNT);
         String uaStr = converters[0].convert(arguments[0].get()).toString();
 
         // 默认值设置为null
-        initEmptyArray();
         if (StringUtils.isBlank(uaStr) || StringUtils.equals(BLANK_UA_STR, uaStr) || StringUtils.equals(UNKNOWN_UA_STR, uaStr)) {
+            initEmptyArray(result);
             return result;
         }
 
         // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
-        Text deviceModel = new Text("");
-        Text osName = new Text("");
-        Text osVersion = new Text("");
-        Text osVersionName = new Text("");
-        Text packageVersion = new Text("");
-        Text packageName = new Text("");
+        String deviceModel = "";
+        String osName = "";
+        String osVersion = "";
+        String osVersionName = "";
+        String packageVersion = "";
+        String packageName = "";
 
         // 添加默认值
         if (!StringUtils.startsWith(uaStr, ANDROID_UA_PREFIX) && !StringUtils.startsWith(uaStr, IOS_UA_PREFIX)) {
             // 清除默认值
-            result.clear();
             // 解析UA
             Client c = uaParser.parse(uaStr);
             // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
-            deviceModel.set(Optional.of(c.device).orElse(null).family);
-            osName.set(Optional.of(c.os).orElse(null).family);
-            osVersion.set(Optional.of(c.os).orElse(null).minor);
-            osVersionName.set(Optional.of(c.os).orElse(null).major);
-            packageVersion.set(Optional.of(c.userAgent).orElse(null).minor);
-            packageName.set(Optional.of(c.userAgent).orElse(null).major);
+            deviceModel = formatValue(Optional.of(c.device).orElse(null).family);
+            osName = formatValue(Optional.of(c.os).orElse(null).family);
+            osVersion = formatValue(Optional.of(c.os).orElse(null).minor);
+            osVersionName = formatValue(Optional.of(c.os).orElse(null).major);
+            packageVersion = formatValue(Optional.of(c.userAgent).orElse(null).minor);
+            packageName = formatValue(Optional.of(c.userAgent).orElse(null).major);
         }
 
         // com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)
@@ -105,20 +105,20 @@ public class UDFParseUserAgent  extends GenericUDF {
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
                 String uaPackageVersion = uaArr[0];
                 String[] uaPvArr = uaPackageVersion.split("/");
-                packageName.set(uaPvArr[0]);
-                packageVersion.set(UNKNOWN_STR);
+                packageName = uaPvArr[0];
+                packageVersion = UNKNOWN_STR;
                 if (uaPvArr.length > 1) {
-                    packageVersion.set(uaPvArr[1]);
+                    packageVersion = uaPvArr[1];
                 }
 
                 String[] uaOsDeviceFmParams = uaArr[1].split(" ", 2);
-                osName.set(uaOsDeviceFmParams[0]);
-                deviceModel.set(UNKNOWN_STR);
+                osName = uaOsDeviceFmParams[0];
+                deviceModel = UNKNOWN_STR;
                 if (uaOsDeviceFmParams.length > 1) {
-                    deviceModel.set(uaOsDeviceFmParams[1]);
+                    deviceModel = uaOsDeviceFmParams[1];
                 }
-                osVersionName.set(uaArr[2]);
-                osVersion.set(uaArr[3]);
+                osVersionName = uaArr[2];
+                osVersion = uaArr[3];
             } catch (Exception e) {
                 // 异常处理
                  logger.error("解析android UA错误, ua = {}", uaStr, e);
@@ -127,9 +127,9 @@ public class UDFParseUserAgent  extends GenericUDF {
             // 特殊ua
             // com.ccc.chinagoodsbuyer/1.3.0;iOS
             if (StringUtils.equals(uaStr.trim(), "com.ccc.chinagoodsbuyer/1.3.0;iOS")) {
-                packageName.set("com.ccc.chinagoodsbuyer");
-                packageVersion.set("1.3.0");
-                osName.set("iOS");
+                packageName = "com.ccc.chinagoodsbuyer";
+                packageVersion = "1.3.0";
+                osName = "iOS";
             } else {
                 // com.ccc.chinagoodsbuyer/2.0.1;iOS unknown;16.3.1;zh
                 logger.debug("uaStr: {}", uaStr);
@@ -137,27 +137,22 @@ public class UDFParseUserAgent  extends GenericUDF {
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
                 String uaPackageVersion = uaArr[0];
                 String[] uaPvArr = uaPackageVersion.split("/");
-                packageName.set(uaPvArr[0]);
-                packageVersion.set(UNKNOWN_STR);
+                packageName = uaPvArr[0];
+                packageVersion = UNKNOWN_STR;
                 if (uaPvArr.length > 1) {
-                    packageVersion.set(uaPvArr[1]);
+                    packageVersion = uaPvArr[1];
                 }
 
                 String[] uaOsDeviceFmParams = uaArr[1].split(" ", 2);
-                osName.set(uaOsDeviceFmParams[0]);
-                deviceModel.set(UNKNOWN_STR);
-                if (uaOsDeviceFmParams.length > 1) {
-                    deviceModel.set(uaOsDeviceFmParams[1]);
-                }
-                osVersion.set(uaArr[2]);
+                osName = uaOsDeviceFmParams[0];
+                osVersion = uaArr[2];
                 logger.debug("当前uaArr: {}", uaArr[2]);
-                osVersionName.set(uaArr[2].split("\\.", 2)[0]);
-                deviceModel.set("IPhone");
+                osVersionName = uaArr[2].split("\\.", 2)[0];
+                deviceModel =  "IPhone";
             }
         }
 
         // 清除默认值
-        result.clear();
         result.add(deviceModel);
         result.add(osName);
         result.add(osVersion);
@@ -167,12 +162,17 @@ public class UDFParseUserAgent  extends GenericUDF {
         return result;
     }
 
-    private void initEmptyArray() {
+    private void initEmptyArray(List<String> result) {
         result.clear();
         for (int i = 0; i < RET_ARRAY_SIZE; i++) {
             result.add(null);
         }
     }
+
+    private String formatValue(String value) {
+        return value != null ? value : "";
+    }
+
 
     @Override
     public String getDisplayString(String[] children) {
@@ -180,7 +180,7 @@ public class UDFParseUserAgent  extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-//        String uaStr = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36";
+//        String uaStr = "Mozilla/5.0 (Linux; Android 12; NOH-AN00 Build/HUAWEINOH-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/111.0.5563.116 Mobile Safari/537.36 XWEB/5131 MMWEBSDK/20230504 MMWEBID/9466 MicroMessenger/8.0.37.2380(0x2800255B) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64";
 //        String uaStr = "com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)";
         String uaStr = "com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)";
         UDFParseUserAgent urlFormat = new UDFParseUserAgent();
@@ -191,7 +191,7 @@ public class UDFParseUserAgent  extends GenericUDF {
         ObjectInspector[] inspectorArr = new ObjectInspector[1];
         inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         urlFormat.initialize(inspectorArr);
-        ArrayList<Text> retArr = (ArrayList<Text>) urlFormat.evaluate(deferredObjects);
+        ArrayList<String> retArr = urlFormat.evaluate(deferredObjects);
         System.out.println(retArr);
 //        Parser uaParser = new Parser();
 //        Client c = uaParser.parse(uaStr);
