@@ -70,6 +70,14 @@ public class UDFParseUserAgent  extends GenericUDF {
             return result;
         }
 
+        // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
+        Text deviceModel = new Text("");
+        Text osName = new Text("");
+        Text osVersion = new Text("");
+        Text osVersionName = new Text("");
+        Text packageVersion = new Text("");
+        Text packageName = new Text("");
+
         // 添加默认值
         if (!StringUtils.startsWith(uaStr, ANDROID_UA_PREFIX) && !StringUtils.startsWith(uaStr, IOS_UA_PREFIX)) {
             // 清除默认值
@@ -77,81 +85,56 @@ public class UDFParseUserAgent  extends GenericUDF {
             // 解析UA
             Client c = uaParser.parse(uaStr);
             // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
-            result.add(getNonNullTextValue(Optional.of(c.device).orElse(null).family));
-            result.add(getNonNullTextValue(Optional.of(c.os).orElse(null).family));
-            result.add(getNonNullTextValue(Optional.of(c.os).orElse(null).minor));
-            result.add(getNonNullTextValue(Optional.of(c.os).orElse(null).major));
-            result.add(getNonNullTextValue(Optional.of(c.userAgent).orElse(null).minor));
-            result.add(getNonNullTextValue(Optional.of(c.userAgent).orElse(null).major));
-        } else if (StringUtils.startsWith(uaStr, ANDROID_UA_PREFIX)) {
-            // 清除默认值
-            result.clear();
+            deviceModel.set(Optional.of(c.device).orElse(null).family);
+            osName.set(Optional.of(c.os).orElse(null).family);
+            osVersion.set(Optional.of(c.os).orElse(null).minor);
+            osVersionName.set(Optional.of(c.os).orElse(null).major);
+            packageVersion.set(Optional.of(c.userAgent).orElse(null).minor);
+            packageName.set(Optional.of(c.userAgent).orElse(null).major);
+        }
 
-            // com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)
-            uaStr = uaStr.replace(")", "")
-                    .replace(" (", SEMICOLON_SEP)
-                    .replace("; ", SEMICOLON_SEP);
+        // com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)
+        // com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)
+        uaStr = uaStr.replace(")", "")
+                .replace(" (", SEMICOLON_SEP)
+                .replace("; ", SEMICOLON_SEP);
+        if (StringUtils.startsWith(uaStr, ANDROID_UA_PREFIX)) {
             // 正则切分
-            // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
             try {
                 // com.scgroup.shopmall/1.2.3;Android ELE-AL00;U;OS 10;zh
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
                 String uaPackageVersion = uaArr[0];
                 String[] uaPvArr = uaPackageVersion.split("/");
-                Text packageName = getNonNullTextValue(uaPvArr[0]);
-                Text packageVersion = new Text(UNKNOWN_STR);
+                packageName.set(uaPvArr[0]);
+                packageVersion.set(UNKNOWN_STR);
                 if (uaPvArr.length > 1) {
-                    packageVersion = getNonNullTextValue(uaPvArr[1]);
+                    packageVersion.set(uaPvArr[1]);
                 }
-                String[] uaOsDeviceFmParams = uaArr[1].split(" ", 2);
-                Text osName = getNonNullTextValue(uaOsDeviceFmParams[0]);
-                Text deviceModel = new Text(UNKNOWN_STR);
-                if (uaOsDeviceFmParams.length > 1) {
-                    deviceModel = getNonNullTextValue(uaOsDeviceFmParams[1]);
-                }
-                Text osVersionName = getNonNullTextValue(uaArr[2]);
-                Text osVersion = getNonNullTextValue(uaArr[3]);
 
-                // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
-                result.add(deviceModel);
-                result.add(osName);
-                result.add(osVersion);
-                result.add(osVersionName);
-                result.add(packageVersion);
-                result.add(packageName);
+                String[] uaOsDeviceFmParams = uaArr[1].split(" ", 2);
+                osName.set(uaOsDeviceFmParams[0]);
+                deviceModel.set(UNKNOWN_STR);
+                if (uaOsDeviceFmParams.length > 1) {
+                    deviceModel.set(uaOsDeviceFmParams[1]);
+                }
+                osVersionName.set(uaArr[2]);
+                osVersion.set(uaArr[3]);
             } catch (Exception e) {
                 // 异常处理
                  logger.error("解析android UA错误, ua = {}", uaStr, e);
             }
         } else if (StringUtils.startsWith(uaStr, IOS_UA_PREFIX)) {
-            // 清除默认值
-            result.clear();
-
-            // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
-            Text deviceModel = new Text("");
-            Text osName = new Text("");
-            Text osVersion = new Text("");
-            Text osVersionName = new Text("");
-            Text packageVersion = new Text("");
-            Text packageName = new Text("");
-
             // 特殊ua
-            // com.ccc.chinagoodsbuyer/1.3.0 (iOS
-            if (StringUtils.equals(uaStr.trim(), "com.ccc.chinagoodsbuyer/1.3.0 (iOS")) {
+            // com.ccc.chinagoodsbuyer/1.3.0;iOS
+            if (StringUtils.equals(uaStr.trim(), "com.ccc.chinagoodsbuyer/1.3.0;iOS")) {
                 packageName.set("com.ccc.chinagoodsbuyer");
                 packageVersion.set("1.3.0");
                 osName.set("iOS");
-
-                result.add(new Text("com.ccc.chinagoodsbuyer"));
-                result.add(new Text("1.3.0"));
             } else {
-                // com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)
-                // IOS app customer ua
-                uaStr = uaStr.replace(")", "").replace(" (", SEMICOLON_SEP).replace("; ", SEMICOLON_SEP);
                 // com.ccc.chinagoodsbuyer/2.0.1;iOS unknown;16.3.1;zh
+                logger.debug("uaStr: {}", uaStr);
                 // 正则切分
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
-
                 String uaPackageVersion = uaArr[0];
                 String[] uaPvArr = uaPackageVersion.split("/");
                 packageName.set(uaPvArr[0]);
@@ -167,8 +150,20 @@ public class UDFParseUserAgent  extends GenericUDF {
                     deviceModel.set(uaOsDeviceFmParams[1]);
                 }
                 osVersion.set(uaArr[2]);
+                logger.info("当前uaArr: {}", uaArr[2]);
+                osVersionName.set(uaArr[2].split("\\.", 2)[0]);
+                deviceModel.set("IPhone");
             }
         }
+
+        // 清除默认值
+        result.clear();
+        result.add(deviceModel);
+        result.add(osName);
+        result.add(osVersion);
+        result.add(osVersionName);
+        result.add(packageVersion);
+        result.add(packageName);
         return result;
     }
 
@@ -179,18 +174,15 @@ public class UDFParseUserAgent  extends GenericUDF {
         }
     }
 
-    private Text getNonNullTextValue(String value) {
-        value = value != null ? value : "";
-        return new Text(value);
-    }
-
     @Override
     public String getDisplayString(String[] children) {
         return "parse_user_agent(" + children[0] + ")";
     }
 
     public static void main(String[] args) throws HiveException {
-        String uaStr = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36";
+//        String uaStr = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36";
+//        String uaStr = "com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)";
+        String uaStr = "com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)";
         UDFParseUserAgent urlFormat = new UDFParseUserAgent();
         DeferredObject[] deferredObjects = new DeferredObject[2];
         // 平台类型、sc_url
