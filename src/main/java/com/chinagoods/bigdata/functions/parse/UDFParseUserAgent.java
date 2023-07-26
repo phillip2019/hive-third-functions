@@ -40,14 +40,14 @@ public class UDFParseUserAgent  extends GenericUDF {
 
     private static final int ARG_COUNT = 1;
     public static final Integer RET_ARRAY_SIZE = 6;
-    public static final String ANDROID_UA_PREFIX = "com.scgroup.shopmall";
+    public static final String ANDROID_UA_PREFIX = "com.scgroup.shop";
     public static final String IOS_UA_PREFIX = "com.ccc.chinagoods";
     public static final String BLANK_UA_STR = "-";
     public static final String UNKNOWN_UA_STR = "AppName";
     public static final String SEMICOLON_SEP = ";";
     public static final String UNKNOWN_STR = "unknown";
     public static final String RST_UNKNOWN_STR = "unknown,unknown,unknown,unknown,unknown,unknown";
-    private Parser uaParser = new Parser();
+    private Parser uaParser = null;
 
     private CacheLoader<String, String> uaLoader = null;
 
@@ -65,12 +65,14 @@ public class UDFParseUserAgent  extends GenericUDF {
             throw new UDFArgumentException (
                     "The function parse_ua takes exactly " + ARG_COUNT + " arguments.");
         }
+
+        uaParser  = new Parser();
+
         converters = new ObjectInspectorConverters.Converter[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-
         uaLoader = new CacheLoader<String, String>() {
             @Override
             public String load(String key) {
@@ -84,7 +86,6 @@ public class UDFParseUserAgent  extends GenericUDF {
                 //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .build(uaLoader);
-
 //        return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
@@ -143,6 +144,7 @@ public class UDFParseUserAgent  extends GenericUDF {
         }
 
         // com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)
+        // com.scgroup.shopbusiness/2.4.0 (Android STK-AL00; U; OS 10; zh)
         // com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)
         uaStr = uaStr.replace(")", "")
                 .replace(" (", SEMICOLON_SEP)
@@ -151,6 +153,7 @@ public class UDFParseUserAgent  extends GenericUDF {
             // 正则切分
             try {
                 // com.scgroup.shopmall/1.2.3;Android ELE-AL00;U;OS 10;zh
+                // com.scgroup.shopbusiness/2.4.0;Android STK-AL00;U;OS 10;zh
 //                com.scgroup.shopmall/2.2.7;iOS iPhone X
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
                 String uaPackageVersion = uaArr[0];
@@ -202,7 +205,7 @@ public class UDFParseUserAgent  extends GenericUDF {
                 osVersion = uaArr[2];
                 logger.debug("当前uaArr: {}", uaArr[2]);
                 osVersionName = uaArr[2].split("\\.", 2)[0];
-                deviceModel =  "IPhone";
+                deviceModel =  "iPhone";
             }
         }
 
@@ -236,7 +239,7 @@ public class UDFParseUserAgent  extends GenericUDF {
 
     public static void main(String[] args) throws HiveException {
 //        String uaStr = "Mozilla/5.0 (Linux; Android 12; NOH-AN00 Build/HUAWEINOH-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/111.0.5563.116 Mobile Safari/537.36 XWEB/5131 MMWEBSDK/20230504 MMWEBID/9466 MicroMessenger/8.0.37.2380(0x2800255B) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64";
-        String uaStr = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FTDv3 Browser; .NET CLR 1.0.3705; AvaliablePing)";
+        String uaStr = "com.scgroup.shopbusiness/2.4.0 (Android STK-AL00; U; OS 10; zh)";
 //        String uaStr = "com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)";
 //        String uaStr = "com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)";
 //        String uaStr = "com.scgroup.shopmall/2.2.7;iOS iPhone X";
@@ -261,9 +264,9 @@ public class UDFParseUserAgent  extends GenericUDF {
         ObjectInspector[] inspectorArr = new ObjectInspector[1];
         inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         urlFormat.initialize(inspectorArr);
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1; i++) {
             Object retArr = urlFormat.evaluate(deferredObjects);
-//            System.out.println(retArr);
+            System.out.println(retArr);
         }
         long end = System.currentTimeMillis();
         System.out.println("测试1耗时："+ (end - begin) + "ms");
