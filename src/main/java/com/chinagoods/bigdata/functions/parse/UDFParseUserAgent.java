@@ -190,6 +190,10 @@ public class UDFParseUserAgent  extends GenericUDF {
                 packageName = "com.ccc.chinagoodsbuyer";
                 packageVersion = "1.3.0";
                 osName = "iOS";
+            } else if (StringUtils.equals(uaStr.trim(), "com.ccc.chinagoodsbuyer/1.3.1;iOS")) {
+                packageName = "com.ccc.chinagoodsbuyer";
+                packageVersion = "1.3.1";
+                osName = "iOS";
             } else {
                 // com.ccc.chinagoodsbuyer/2.0.1;iOS unknown;16.3.1;zh
                 logger.debug("uaStr: {}", uaStr);
@@ -244,7 +248,8 @@ public class UDFParseUserAgent  extends GenericUDF {
 
     public static void main(String[] args) throws HiveException {
 //        String uaStr = "Mozilla/5.0 (Linux; Android 12; NOH-AN00 Build/HUAWEINOH-AN00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/111.0.5563.116 Mobile Safari/537.36 XWEB/5131 MMWEBSDK/20230504 MMWEBID/9466 MicroMessenger/8.0.37.2380(0x2800255B) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64";
-        String uaStr = "com.scgroup.shopbusiness/2.4.0 (Android STK-AL00; U; OS 10; zh)";
+//        String uaStr = "com.scgroup.shopbusiness/2.4.0 (Android STK-AL00; U; OS 10; zh)";
+        String uaStr = "com.ccc.chinagoodsbuyer/1.3.1 (iOS";
 //        String uaStr = "com.scgroup.shopmall/1.2.3 (Android ELE-AL00; U; OS 10; zh)";
 //        String uaStr = "com.ccc.chinagoodsbuyer/2.0.1 (iOS unknown; 16.3.1; zh)";
 //        String uaStr = "com.scgroup.shopmall/2.2.7;iOS iPhone X";
