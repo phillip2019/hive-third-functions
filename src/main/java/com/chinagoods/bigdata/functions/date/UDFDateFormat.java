@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @author songxiaowei
  * date: 2023-08-13
  */
-@Description(name = "datetime_format"
+@Description(name = "date_format"
         , value = "_FUNC_(date, format, target_format) - Take an original date string and its corresponding string date format as input, and output a date string in standard format or a customized target format."
         , extended = "Example:\n > select _FUNC_(date_string, format, target_format) from src;\n > select _FUNC_(date, 'dd/MMM/yyyy:HH:mm:ss Z') from src;")
 public class UDFDateFormat extends UDF {
