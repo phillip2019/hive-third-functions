@@ -30,23 +30,24 @@ import java.util.concurrent.TimeUnit;
  * @author zyl
  * date: 2023-07-19
  * time: 17:53
- * describe: 解析ua获取device_family、os_family、os_minor、os_major、user_agent_minor和user_agent_major
+ * describe: 解析ua获取device_family、os_family、os_minor、os_major、user_agent_family、user_agent_minor和user_agent_major
  */
 @Description(name = "parse_user_agent"
-        , value = "_FUNC_(string) - Parses the user agent and returns an ArrayList<Text> containing device_family, os_family, os_minor, os_major, user_agent_minor, and user_agent_major."
+        , value = "_FUNC_(string) - Parses the user agent and returns an ArrayList<Text> containing device_family, os_family, os_minor, os_major, user_agent_family， user_agent_minor, and user_agent_major."
         , extended = "Example:\n> SELECT _FUNC_(ua) FROM src;")
 public class UDFParseUserAgent  extends GenericUDF {
     public static final Logger logger = LoggerFactory.getLogger(UDFParseUserAgent.class);
 
     private static final int ARG_COUNT = 1;
-    public static final Integer RET_ARRAY_SIZE = 6;
+    public static final Integer RET_ARRAY_SIZE = 7;
     public static final String ANDROID_UA_PREFIX = "com.scgroup.shop";
     public static final String IOS_UA_PREFIX = "com.ccc.chinagoods";
     public static final String BLANK_UA_STR = "-";
     public static final String UNKNOWN_UA_STR = "AppName";
     public static final String SEMICOLON_SEP = ";";
+    public static final String COMMA_SEP = ",";
     public static final String UNKNOWN_STR = "unknown";
-    public static final String RST_UNKNOWN_STR = "unknown,unknown,unknown,unknown,unknown,unknown";
+    public static final String RST_UNKNOWN_STR = initRst();
     private Parser uaParser = null;
 
     private CacheLoader<String, String> uaLoader = null;
@@ -108,14 +109,14 @@ public class UDFParseUserAgent  extends GenericUDF {
         ArrayList<String> rstList = new ArrayList<>(RET_ARRAY_SIZE);
         // 默认值设置为null
         if (StringUtils.isBlank(uaStr) || StringUtils.equals(BLANK_UA_STR, uaStr) || StringUtils.equals(UNKNOWN_UA_STR, uaStr)) {
-            initEmptyArray(rstList);
-            return StringUtils.join(rstList, ",");
+            return RST_UNKNOWN_STR;
         }
         // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
         String deviceModel = UNKNOWN_STR;
         String osName = UNKNOWN_STR;
         String osVersion = UNKNOWN_STR;
         String osVersionName = UNKNOWN_STR;
+        String userAgentFamily = UNKNOWN_STR;
         String packageVersion = UNKNOWN_STR;
         String packageName = UNKNOWN_STR;
 
@@ -131,14 +132,14 @@ public class UDFParseUserAgent  extends GenericUDF {
             }
 
             if (Objects.isNull(c)) {
-                initEmptyArray(rstList);
-                return StringUtils.join(rstList, ",");
+                return RST_UNKNOWN_STR;
             }
             // 0: 设备硬件型号 1: 操作系统型号 2: 操作系统小版本 3: 操作系统大版本 4: 浏览器小版本 5: 浏览器大版本
             deviceModel = formatValue(Optional.of(c.device).orElse(null).family);
             osName = formatValue(Optional.of(c.os).orElse(null).family);
             osVersion = formatValue(Optional.of(c.os).orElse(null).minor);
             osVersionName = formatValue(Optional.of(c.os).orElse(null).major);
+            userAgentFamily = formatValue(Optional.of(c.userAgent).orElse(null).family);
             packageVersion = formatValue(Optional.of(c.userAgent).orElse(null).minor);
             packageName = formatValue(Optional.of(c.userAgent).orElse(null).major);
         }
@@ -158,6 +159,7 @@ public class UDFParseUserAgent  extends GenericUDF {
                 String[] uaArr = uaStr.split(SEMICOLON_SEP);
                 String uaPackageVersion = uaArr[0];
                 String[] uaPvArr = uaPackageVersion.split("/");
+                userAgentFamily = "Android";
                 packageName = uaPvArr[0];
                 packageVersion = UNKNOWN_STR;
                 if (uaPvArr.length > 1) {
@@ -180,6 +182,7 @@ public class UDFParseUserAgent  extends GenericUDF {
                 logger.error("解析android UA错误, ua = {}", uaStr, e);
             }
         } else if (StringUtils.startsWith(uaStr, IOS_UA_PREFIX)) {
+            userAgentFamily = "ios";
             // 处理旧版本ua
             // 特殊ua
             // com.ccc.chinagoodsbuyer/1.3.0;iOS
@@ -214,17 +217,19 @@ public class UDFParseUserAgent  extends GenericUDF {
         rstList.add(osName);
         rstList.add(osVersion);
         rstList.add(osVersionName);
+        rstList.add(userAgentFamily);
         rstList.add(packageVersion);
         rstList.add(packageName);
-        String rstUaStr = StringUtils.join(rstList, ",");
-        return rstUaStr;
+        return StringUtils.join(rstList, ",");
     }
 
-    private void initEmptyArray(List<String> result) {
-        result.clear();
+    private static String initRst() {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < RET_ARRAY_SIZE; i++) {
-            result.add(UNKNOWN_STR);
+            sb.append(UNKNOWN_STR);
+            sb.append(COMMA_SEP);
         }
+        return sb.substring(0, sb.length() - 1);
     }
 
     private String formatValue(String value) {
