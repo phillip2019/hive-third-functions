@@ -30,9 +30,9 @@ public class UDFRiskKeywords extends GenericUDF {
 
     private static final Logger logger = LoggerFactory.getLogger(UDFRiskKeywords.class);
 
-    public static final String DB_URL = "jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false";
-    public static final String DB_USER = "datax";
-    public static final String DB_PASSWORD = "oRvmRrVJeOCl8XsY";
+    public static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    public static final String DB_USER = "source";
+    public static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     public static final String SELECT_RISK_KEYWORDS_SQL = "select t.key_word\n" +
             "from risk_control_keywords t\n" +
             "inner join (\n" +

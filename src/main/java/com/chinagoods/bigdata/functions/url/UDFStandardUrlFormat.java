@@ -36,9 +36,6 @@ import java.util.regex.Pattern;
         , extended = "Example:\n> SELECT _FUNC_(platform_type,sc_url) FROM src;")
 public class UDFStandardUrlFormat extends GenericUDF {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
-//    private static final String DB_URL = "jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false";
-//    private static final String DB_USER = "datax";
-//    private static final String DB_PASSWORD = "oRvmRrVJeOCl8XsY";
     private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";

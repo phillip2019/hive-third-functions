@@ -132,9 +132,9 @@ final public class MysqlUtil {
     }
 
     public static void main(String[] args) throws SQLException {
-        MysqlUtil mysqlUtil = new MysqlUtil("jdbc:mysql://rm-uf6wr9aa537v0tesf3o.mysql.rds.aliyuncs.com:3306/source?characterEncoding=UTF-8&useSSL=false",
-                "datax",
-                "oRvmRrVJeOCl8XsY");
+        MysqlUtil mysqlUtil = new MysqlUtil("jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false",
+                "source",
+                "jP8*dKw,bRjBVos=");
         System.out.println(mysqlUtil.getKeywords("select t.key_word\n" +
                 "from risk_control_keywords t\n" +
                 "inner join (\n" +
