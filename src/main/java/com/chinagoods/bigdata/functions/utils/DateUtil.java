@@ -220,10 +220,20 @@ public class DateUtil {
 
     /**
      * 13位时间戳转换成ds字符串
+     * @param timestamp13 13位时间戳
      **/
     public static String getDate2DSString(long timestamp13) {
+        return parse(timestamp13, DATE_DS_FORMAT);
+    }
+
+    /**
+     * 13位时间戳转换成字符串
+     * @param timestamp13 13位时间戳
+     * @param format 格式化
+     **/
+    public static String parse(long timestamp13, String format) {
         Instant instant = Instant.ofEpochMilli(timestamp13);
-        return format(LocalDateTime.ofInstant(instant, DEFAULT_ZONE_OFFSET), DATE_DS_FORMAT);
+        return format(LocalDateTime.ofInstant(instant, DEFAULT_ZONE_OFFSET), format);
     }
 
 
