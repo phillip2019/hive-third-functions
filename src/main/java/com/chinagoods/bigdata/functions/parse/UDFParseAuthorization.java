@@ -22,6 +22,8 @@ import org.springframework.security.jwt.JwtHelper;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -137,9 +139,12 @@ public class UDFParseAuthorization extends GenericUDF {
         rstList.add(formatValue(userNameJsonNode, "phone", UNKNOWN_STR));
         rstList.add(formatValue(userNameJsonNode, "email", UNKNOWN_STR));
         rstList.add(formatValue(userNameJsonNode, "nickName", UNKNOWN_STR));
-        rstList.add(result.get("client_id").asText(UNKNOWN_STR));
-        long registerTime = userNameJsonNode.get("registerTime").asLong(63043200000L);
-        String registerTimeStr = DateUtil.parse(registerTime, DateUtil.DEFAULT_DATE_TIME_FORMAT);
+        if (Objects.nonNull(result.get("client_id"))) {
+            rstList.add(result.get("client_id").asText());
+        } else {
+            rstList.add(UNKNOWN_STR);
+        }
+        String registerTimeStr = formatValue(userNameJsonNode, "registerTime", 63043200000L);
         rstList.add(registerTimeStr);
         return StringUtils.join(rstList, ",");
     }
@@ -154,11 +159,25 @@ public class UDFParseAuthorization extends GenericUDF {
     }
 
     private static String formatValue(JsonNode jn, String key, String defaultValue) {
-        String val = jn.get(key).asText(defaultValue);
+        JsonNode valJn = jn.get(key);
+        if (valJn == null) {
+            return UNKNOWN_STR;
+        }
+        String val = valJn.asText(defaultValue);
         if (StringUtils.isBlank(val)) {
             return UNKNOWN_STR;
         }
         return val;
+    }
+
+    private static String formatValue(JsonNode jn, String key, long defaultValue) {
+        JsonNode valJn = jn.get(key);
+        if (valJn == null) {
+            return "0000-00-00 00:00:00";
+        }
+        Long val = valJn.asLong(defaultValue);
+
+        return DateUtil.parse(val, DateUtil.DEFAULT_DATE_TIME_FORMAT);
     }
 
     @Override
@@ -167,7 +186,8 @@ public class UDFParseAuthorization extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String tokenStr = "sec-ch-ua-mobile: ?0\\naccept: application/json, text/plain, */*\\nauthorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6InNtcyIsImxvZ2luTmFtZSI6IjEzODAxMzk3NDU2IiwiYXBwSWQiOm51bGwsInVuaW9uSWQiOm51bGwsImFsaXBheVVzZXJJZCI6bnVsbCwiaXNBZG1pbiI6ZmFsc2UsInVzZXJJZCI6ODY2NTAzMywiZW1haWwiOm51bGwsInBob25lIjoiMTM4MDEzOTc0NTYiLCJhdXRoU3RhdHVzIjoiTk8iLCJjdXNjY1N0YXR1cyI6Ik5PIiwiZW1haWxTdGF0dXMiOiJOTyIsInVzZXJUeXBlIjoiUEVSU09OQUwiLCJyZWdpc3RlclRpbWUiOjE2OTM3MDYwNzEwMDAsInVzZXJOYW1lIjoiIiwibmlja05hbWUiOiLph4fotK3llYZ5b3FsMDY3MiIsImhlYWRQb3J0cmFpdCI6IiJ9LCJzY29wZSI6WyJVU0VSIl0sImV4cCI6MTY5NDU4MDA5MywiYXV0aG9yaXRpZXMiOlsiQlVZRVIiXSwianRpIjoiNzQxMjllNDctZjFkYy00OGJkLWJlYjgtMzkyOGY4MjdiN2E2IiwiY2xpZW50X2lkIjoidXNlciJ9.flnyAlwCS42VzNZkaEYl4aH0d_uqOVECtCaaKQ8W33fCClQazMsiBXXPrGhSnKdHs2RZJKz2oaMUKyW-v5CgUf82n4PUzJ8hBZQz-Jw_HXC2lPbneSBgIW58V8htAhp9KTgVwuvAG-jqAhG_eep3KiFIo4YcuuchuVbiEW1gCQ7-cy61Vvr4kBYocy3B56zK7jh-Y9Uv2GVtzv65kU8clWqIu580YUva5M-eka2lt0p6tpbmWUSrezsrO\n";
+        String tokenStr = "remote-port: 34021\n" +
+                "authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6ImFkbWluU21zIiwibG9naW5OYW1lIjoiMTg4Njc5NDkwNzMiLCJhcHBJZCI6IkNISU5BX0dPT0RTIiwidW5pb25JZCI6bnVsbCwiYWxpcGF5VXNlcklkIjpudWxsLCJpc0FkbWluIjp0cnVlLCJ3eFVzZXJJZCI6IiIsImdlbmRlciI6IkYiLCJkZWwiOiJOIiwicHJpdmlsZWdlIjoiWSIsInNob3J0UGhvbmUiOiIiLCJ1c2VyTmFtZSI6IueOi-iVviIsInJhbmtJZExpc3QiOlsiV0FOR0xFSSJdLCJsYXN0TG9naW5UaW1lIjoiMjAyMy0wOS0wMVQxNzoxMzo1NiIsInJlYWxOYW1lIjoi546L6JW-IiwibW9kaWZ5VGltZSI6IjIwMjMtMDktMDFUMTc6MTM6NTYiLCJwb3NpdGlvbklkIjo2MjEsImNyZWF0ZVRpbWUiOiIyMDIyLTA2LTE0VDE0OjQxOjE0IiwicGFzc3dkIjoiJDJhJDEwJGwxN0hPTHNDRHQ0RWVsampUTmI4Sk92RHZhUG1KQ0xReDUwUTQucmFqQTVoQWthN1JEb0d5IiwicGhvbmUiOiIxODg2Nzk0OTA3MyIsImxvZ28iOiIiLCJzZWxmIjoiTiIsImlkIjo1MzYxfSwic2NvcGUiOlsiQURNSU4iXSwiZXhwIjoxNjk0NDIzNjQ4LCJhdXRob3JpdGllcyI6WyJXQU5HTEVJIl0sImp0aSI6ImNkMDFhYTE4LTRiMGItNGUyNC1hOTRjLWQwYjUyMDU0OGNmZiIsImNsaWVudF9pZCI6ImFkbWluIn0.qUDPy9DA1qq_KG7FiALO28aLi6ICUqmHe4V003iYjnnpkFHxfDR-LG";
         long begin = System.currentTimeMillis();
 
         UDFParseAuthorization parseAuth = new UDFParseAuthorization();
