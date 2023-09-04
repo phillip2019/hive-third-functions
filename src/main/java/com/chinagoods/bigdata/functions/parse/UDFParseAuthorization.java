@@ -114,15 +114,14 @@ public class UDFParseAuthorization extends GenericUDF {
         if (token.contains("undefined") || token.contains("Bearer null")) {
             return RST_UNKNOWN_STR;
         }
-
         token = token.replaceFirst("bearer ", "").replaceFirst("Bearer ", "");
-        Jwt jwt = JwtHelper.decode(token);
-        String claims = jwt.getClaims();
         JsonNode content = null;
         try {
+            Jwt jwt = JwtHelper.decode(token);
+            String claims = jwt.getClaims();
             content = JacksonBuilder.mapper.readTree(claims);
         } catch (Exception e) {
-            logger.error("解析json字符串异常，请检查原始输入数据: {}", claims, e);
+            logger.error("解析json字符串异常，请检查原始输入数据: {}", token, e);
             return RST_UNKNOWN_STR;
         }
         Map<String, JsonNode> result = JacksonBuilder.mapper.convertValue(content, new TypeReference<Map<String, JsonNode>>(){});
@@ -133,11 +132,11 @@ public class UDFParseAuthorization extends GenericUDF {
         }
         // 清除默认值
         // 0: user_id 1: login_name 2: phone 3: email 4: nick_name 5: client_id 6: register_time
-        rstList.add(userNameJsonNode.get("userId").asText(UNKNOWN_STR));
-        rstList.add(userNameJsonNode.get("loginName").asText(UNKNOWN_STR));
-        rstList.add(userNameJsonNode.get("phone").asText(UNKNOWN_STR));
-        rstList.add(userNameJsonNode.get("email").asText(UNKNOWN_STR));
-        rstList.add(userNameJsonNode.get("nickName").asText(UNKNOWN_STR));
+        rstList.add(formatValue(userNameJsonNode, "userId", UNKNOWN_STR));
+        rstList.add(formatValue(userNameJsonNode, "loginName", UNKNOWN_STR));
+        rstList.add(formatValue(userNameJsonNode, "phone", UNKNOWN_STR));
+        rstList.add(formatValue(userNameJsonNode, "email", UNKNOWN_STR));
+        rstList.add(formatValue(userNameJsonNode, "nickName", UNKNOWN_STR));
         rstList.add(result.get("client_id").asText(UNKNOWN_STR));
         long registerTime = userNameJsonNode.get("registerTime").asLong(63043200000L);
         String registerTimeStr = DateUtil.parse(registerTime, DateUtil.DEFAULT_DATE_TIME_FORMAT);
@@ -154,15 +153,21 @@ public class UDFParseAuthorization extends GenericUDF {
         return sb.substring(0, sb.length() - 1);
     }
 
+    private static String formatValue(JsonNode jn, String key, String defaultValue) {
+        String val = jn.get(key).asText(defaultValue);
+        if (StringUtils.isBlank(val)) {
+            return UNKNOWN_STR;
+        }
+        return val;
+    }
+
     @Override
     public String getDisplayString(String[] children) {
         return "parse_token(" + children[0] + ")";
     }
 
     public static void main(String[] args) throws HiveException {
-        String tokenStr = "accept-encoding: gzip, deflate\n" +
-                "remote-addr: 183.217.25.233\n" +
-                "authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6ImN1c3RvbSIsImxvZ2luTmFtZSI6Im84dDJ0dUhENGlQbmxsX1Nhb2NsdHNFR3R6U2siLCJhcHBJZCI6bnVsbCwidW5pb25JZCI6bnVsbCwiYWxpcGF5VXNlcklkIjpudWxsLCJpc0FkbWluIjpmYWxzZSwidXNlcklkIjo4NjY0NjQ1LCJlbWFpbCI6bnVsbCwicGhvbmUiOiIxOTIzMTE0MzEzOCIsImF1dGhTdGF0dXMiOiJOTyIsImN1c2NjU3RhdHVzIjoiTk8iLCJlbWFpbFN0YXR1cyI6Ik5PIiwidXNlclR5cGUiOiJQRVJTT05BTCIsInJlZ2lzdGVyVGltZSI6MTY5MzY3NTEwMzAwMCwidXNlck5hbWUiOiIiLCJuaWNrTmFtZSI6IumHh-i0reWVhm1peGw1OTc4IiwiaGVhZFBvcnRyYWl0IjoiIn0sInNjb3BlIjpbIlVTRVIiXSwiZXhwIjoxNjk0NTM5MjE3LCJhdXRob3JpdGllcyI6WyJCVVlFUiJdLCJqdGkiOiIyMzgxNzE4Yi1lYmVlLTQ2MzItOTcxMS0yZWVlZDM3ZmEyNGMiLCJjbGllbnRfaWQiOiJ1c2VyIn0.kqWctu0K0lZNBD4qjpZsjsa1PIO8r5GifAyYinHuwR46akiPTszOqz-KHReLNDdEHuUmbPXSqpTZiv2nHPsZc95hyvvCjrfsh-j3S2E5KCfAOG1lnOXSHrcaJ1gpR_Hi0Oj6DaBRW-SIXKB9aFVdDnoM170xE2VT4xF-xyBu80b8OHN1mHhlE6STsuTlGbvaFBmnlBFtDFXSEIaPp8g3VhuwUuGpu1HggE";
+        String tokenStr = "sec-ch-ua-mobile: ?0\\naccept: application/json, text/plain, */*\\nauthorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6InNtcyIsImxvZ2luTmFtZSI6IjEzODAxMzk3NDU2IiwiYXBwSWQiOm51bGwsInVuaW9uSWQiOm51bGwsImFsaXBheVVzZXJJZCI6bnVsbCwiaXNBZG1pbiI6ZmFsc2UsInVzZXJJZCI6ODY2NTAzMywiZW1haWwiOm51bGwsInBob25lIjoiMTM4MDEzOTc0NTYiLCJhdXRoU3RhdHVzIjoiTk8iLCJjdXNjY1N0YXR1cyI6Ik5PIiwiZW1haWxTdGF0dXMiOiJOTyIsInVzZXJUeXBlIjoiUEVSU09OQUwiLCJyZWdpc3RlclRpbWUiOjE2OTM3MDYwNzEwMDAsInVzZXJOYW1lIjoiIiwibmlja05hbWUiOiLph4fotK3llYZ5b3FsMDY3MiIsImhlYWRQb3J0cmFpdCI6IiJ9LCJzY29wZSI6WyJVU0VSIl0sImV4cCI6MTY5NDU4MDA5MywiYXV0aG9yaXRpZXMiOlsiQlVZRVIiXSwianRpIjoiNzQxMjllNDctZjFkYy00OGJkLWJlYjgtMzkyOGY4MjdiN2E2IiwiY2xpZW50X2lkIjoidXNlciJ9.flnyAlwCS42VzNZkaEYl4aH0d_uqOVECtCaaKQ8W33fCClQazMsiBXXPrGhSnKdHs2RZJKz2oaMUKyW-v5CgUf82n4PUzJ8hBZQz-Jw_HXC2lPbneSBgIW58V8htAhp9KTgVwuvAG-jqAhG_eep3KiFIo4YcuuchuVbiEW1gCQ7-cy61Vvr4kBYocy3B56zK7jh-Y9Uv2GVtzv65kU8clWqIu580YUva5M-eka2lt0p6tpbmWUSrezsrO\n";
         long begin = System.currentTimeMillis();
 
         UDFParseAuthorization parseAuth = new UDFParseAuthorization();

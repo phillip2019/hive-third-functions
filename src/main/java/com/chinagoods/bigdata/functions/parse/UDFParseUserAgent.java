@@ -78,7 +78,7 @@ public class UDFParseUserAgent  extends GenericUDF {
             @Override
             public String load(String key) {
                 // 缓存miss时,加载数据的方法
-                logger.info("进入加载数据, key： {}", key);
+                logger.debug("进入加载数据, key： {}", key);
                 return uaParse(key);
             }
         };
