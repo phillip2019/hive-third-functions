@@ -1,5 +1,6 @@
 package com.chinagoods.bigdata.functions.risk.negative;
 
+import com.chinagoods.bigdata.functions.parse.UDFParseAuthorization;
 import com.chinagoods.bigdata.functions.utils.MysqlUtil;
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang.StringUtils;
@@ -105,13 +106,64 @@ public class UDFNewGoodsNegativeString extends GenericUDF {
             logger.error("Type conversion failed", e);
             return false;
         }
-
         return negativeStringMatcher.containsNegativeString(goodName);
+    }
+
+    public Object evaluate2(DeferredObject[] arguments) throws HiveException {
+        assert (arguments.length == ARG_COUNT);
+
+        if (arguments[0].get() == null || StringUtils.isBlank(arguments[0].get().toString())) {
+            return false;
+        }
+
+        String goodName;
+        try {
+            goodName = converters[0].convert(arguments[0].get()).toString();
+        } catch (Exception e) {
+            logger.error("Type conversion failed", e);
+            return false;
+        }
+
+        for (String negativeStr : NEGATIVE_STRING_LIST) {
+            if (goodName.contains(negativeStr)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     @Override
     public String getDisplayString(String[] strings) {
         assert (strings.length == ARG_COUNT);
         return "new_goods_negative(" + strings[0] + ")";
+    }
+
+    public static void main(String[] args) throws HiveException {
+        UDFNewGoodsNegativeString goodsNegativeString = new UDFNewGoodsNegativeString();
+        DeferredObject[] deferredObjects = new DeferredObject[2];
+        deferredObjects[0] = new DeferredJavaObject("2022爆款仿羊绒格子围巾女冬季加厚保暖围脖哈利波特同款披肩男临期");
+        ObjectInspector[] inspectorArr = new ObjectInspector[1];
+        inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        goodsNegativeString.initialize(inspectorArr);
+
+        long begin = System.currentTimeMillis();
+        boolean latest = false;
+
+        for (int i = 0; i < 3000000; i++) {
+            Object retArr = goodsNegativeString.evaluate(deferredObjects);
+            latest = (boolean) retArr;
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("测试1耗时：" + (end - begin) + "ms，结果为: " + latest);
+
+        long begin2 = System.currentTimeMillis();
+        boolean latest2 = false;
+        for (int i = 0; i < 3000000; i++) {
+            Object retArr = goodsNegativeString.evaluate2(deferredObjects);
+            latest2 = (boolean) retArr;
+        }
+        long end2 = System.currentTimeMillis();
+        System.out.println("测试2耗时：" + (end2 - begin2) + "ms，结果为: " + latest2);
     }
 }
