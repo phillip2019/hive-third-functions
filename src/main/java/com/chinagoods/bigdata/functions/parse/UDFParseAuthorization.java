@@ -97,6 +97,7 @@ public class UDFParseAuthorization extends GenericUDF {
             }
         }
         String rstUaStr = RST_UNKNOWN_STR;
+        logger.debug("token: {}", token);
         try {
             rstUaStr = tokenCache.get(token);
         } catch (ExecutionException e) {
@@ -121,6 +122,9 @@ public class UDFParseAuthorization extends GenericUDF {
         try {
             Jwt jwt = JwtHelper.decode(token);
             String claims = jwt.getClaims();
+            if (!StringUtils.startsWith(claims, "{")) {
+                return RST_UNKNOWN_STR;
+            }
             content = JacksonBuilder.mapper.readTree(claims);
         } catch (Exception e) {
             logger.error("解析json字符串异常，请检查原始输入数据: {}", token, e);
@@ -186,8 +190,11 @@ public class UDFParseAuthorization extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String tokenStr = "remote-port: 34021\n" +
-                "authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6ImFkbWluU21zIiwibG9naW5OYW1lIjoiMTg4Njc5NDkwNzMiLCJhcHBJZCI6IkNISU5BX0dPT0RTIiwidW5pb25JZCI6bnVsbCwiYWxpcGF5VXNlcklkIjpudWxsLCJpc0FkbWluIjp0cnVlLCJ3eFVzZXJJZCI6IiIsImdlbmRlciI6IkYiLCJkZWwiOiJOIiwicHJpdmlsZWdlIjoiWSIsInNob3J0UGhvbmUiOiIiLCJ1c2VyTmFtZSI6IueOi-iVviIsInJhbmtJZExpc3QiOlsiV0FOR0xFSSJdLCJsYXN0TG9naW5UaW1lIjoiMjAyMy0wOS0wMVQxNzoxMzo1NiIsInJlYWxOYW1lIjoi546L6JW-IiwibW9kaWZ5VGltZSI6IjIwMjMtMDktMDFUMTc6MTM6NTYiLCJwb3NpdGlvbklkIjo2MjEsImNyZWF0ZVRpbWUiOiIyMDIyLTA2LTE0VDE0OjQxOjE0IiwicGFzc3dkIjoiJDJhJDEwJGwxN0hPTHNDRHQ0RWVsampUTmI4Sk92RHZhUG1KQ0xReDUwUTQucmFqQTVoQWthN1JEb0d5IiwicGhvbmUiOiIxODg2Nzk0OTA3MyIsImxvZ28iOiIiLCJzZWxmIjoiTiIsImlkIjo1MzYxfSwic2NvcGUiOlsiQURNSU4iXSwiZXhwIjoxNjk0NDIzNjQ4LCJhdXRob3JpdGllcyI6WyJXQU5HTEVJIl0sImp0aSI6ImNkMDFhYTE4LTRiMGItNGUyNC1hOTRjLWQwYjUyMDU0OGNmZiIsImNsaWVudF9pZCI6ImFkbWluIn0.qUDPy9DA1qq_KG7FiALO28aLi6ICUqmHe4V003iYjnnpkFHxfDR-LG";
+        String tokenStr = "accept-encoding: gzip, deflate\n" +
+                "connection: keep-alive\n" +
+                "x-waf-uuid: c7e46336c1ab70de220ab8e3971fac14-d239fbf5b68fb4aadd7005b786288140\n" +
+                "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4\n" +
+                "accept: */*";
         long begin = System.currentTimeMillis();
 
         UDFParseAuthorization parseAuth = new UDFParseAuthorization();
