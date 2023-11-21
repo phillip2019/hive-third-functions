@@ -23,10 +23,7 @@ import org.springframework.security.jwt.JwtHelper;
 import javax.servlet.http.Cookie;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -163,7 +160,12 @@ public class UDFParseAuthorization extends GenericUDF {
             logger.error("解析json字符串异常，请检查原始输入数据: {}", token, e);
             return RST_UNKNOWN_STR;
         }
-        Map<String, JsonNode> result = JacksonBuilder.mapper.convertValue(content, new TypeReference<Map<String, JsonNode>>(){});
+        Map<String, JsonNode> result = new HashMap<>(0);
+        try {
+            result = JacksonBuilder.mapper.convertValue(content, new TypeReference<Map<String, JsonNode>>(){});
+        } catch (Exception e) {
+            logger.error("解析json字符串异常检查原始输入数据: {}", token, e);
+        }
         logger.debug("Result: {}", result);
         JsonNode userNameJsonNode = result.get("user_name");
         if (userNameJsonNode == null) {
@@ -225,8 +227,8 @@ public class UDFParseAuthorization extends GenericUDF {
     public static void main(String[] args) throws HiveException {
 //        String tokenStr = "remote-port: 34021\n" +
 //                "authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6ImFkbWluU21zIiwibG9naW5OYW1lIjoiMTg4Njc5NDkwNzMiLCJhcHBJZCI6IkNISU5BX0dPT0RTIiwidW5pb25JZCI6bnVsbCwiYWxpcGF5VXNlcklkIjpudWxsLCJpc0FkbWluIjp0cnVlLCJ3eFVzZXJJZCI6IiIsImdlbmRlciI6IkYiLCJkZWwiOiJOIiwicHJpdmlsZWdlIjoiWSIsInNob3J0UGhvbmUiOiIiLCJ1c2VyTmFtZSI6IueOi-iVviIsInJhbmtJZExpc3QiOlsiV0FOR0xFSSJdLCJsYXN0TG9naW5UaW1lIjoiMjAyMy0wOS0wMVQxNzoxMzo1NiIsInJlYWxOYW1lIjoi546L6JW-IiwibW9kaWZ5VGltZSI6IjIwMjMtMDktMDFUMTc6MTM6NTYiLCJwb3NpdGlvbklkIjo2MjEsImNyZWF0ZVRpbWUiOiIyMDIyLTA2LTE0VDE0OjQxOjE0IiwicGFzc3dkIjoiJDJhJDEwJGwxN0hPTHNDRHQ0RWVsampUTmI4Sk92RHZhUG1KQ0xReDUwUTQucmFqQTVoQWthN1JEb0d5IiwicGhvbmUiOiIxODg2Nzk0OTA3MyIsImxvZ28iOiIiLCJzZWxmIjoiTiIsImlkIjo1MzYxfSwic2NvcGUiOlsiQURNSU4iXSwiZXhwIjoxNjk0NDIzNjQ4LCJhdXRob3JpdGllcyI6WyJXQU5HTEVJIl0sImp0aSI6ImNkMDFhYTE4LTRiMGItNGUyNC1hOTRjLWQwYjUyMDU0OGNmZiIsImNsaWVudF9pZCI6ImFkbWluIn0.qUDPy9DA1qq_KG7FiALO28aLi6ICUqmHe4V003iYjnnpkFHxfDR-LG";
-        String tokenStr = "";
-//        String cookies = "access_token=Bearer%20eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6Ind4QXBwIiwibG9naW5OYW1lIjoibzh0MnR1T3BDMEprVlM3S2U3Qms3WDVYWXdLSSIsImFwcElkIjoid3hlYzZmYWJlY2VlOGU2ZTgwIiwidW5pb25JZCI6Im84dDJ0dU9wQzBKa1ZTN0tlN0JrN1g1WFl3S0kiLCJhbGlwYXlVc2VySWQiOm51bGwsImlzQWRtaW4iOmZhbHNlLCJ1c2VySWQiOjEyODI4MzIsImVtYWlsIjpudWxsLCJwaG9uZSI6IjEzNTY2OTc3MjEwIiwiYXV0aFN0YXR1cyI6Ik5PIiwiY3VzY2NTdGF0dXMiOiJOTyIsImVtYWlsU3RhdHVzIjoiTk8iLCJ1c2VyVHlwZSI6IlBFUlNPTkFMIiwicmVnaXN0ZXJUaW1lIjoxNTk1Mjk2NTg1MDAwLCJ1c2VyTmFtZSI6IiIsIm5pY2tOYW1lIjoi6YeH6LSt5ZWGNWQ1Yzc4ZjAiLCJoZWFkUG9ydHJhaXQiOm51bGx9LCJzY29wZSI6WyJVU0VSIl0sImV4cCI6MTY5ODgxNDA4MCwiYXV0aG9yaXRpZXMiOlsiQlVZRVIiXSwianRpIjoiYTg5NzQ1NGUtM2JmMC00MTA1LWJiODQtZWZiN2QzZWQyZjI2IiwiY2xpZW50X2lkIjoidXNlciJ9.Qvuk9Xj0uDAI1_TPU1gbvFmzjV5spQMNlUk0_UK8IZvFhCtBRtFxlQVBH_dgsXM756FdxCq_z_4tfzfu8k0uXaOpgx2c-pNJqx0CSVz3W7h2qNUyIHlk8F0TdTbwrCr9ye7-iv1ndhhjtqkjlwC06isQEmWvjgRMKXzTp5Zc4tdSRi1h3wMt7WjmBtt4WFmHONJcAVlKoHvoftMOvIvEF8Od2ewmOllvvggY";
+        String tokenStr = "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4";
+//        String cookies = "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4";
         String cookies = "";
 
         long begin = System.currentTimeMillis();
