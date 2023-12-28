@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import javax.servlet.http.Cookie;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -34,12 +34,12 @@ import java.util.concurrent.TimeUnit;
  * describe: 解析headers中的authorization，获取user_id, login_name, phone, email, nick_name, client_id, register_time
  */
 @Description(name = "parse_token"
-        , value = "_FUNC_(string) - Parses the token and returns an ArrayList<Text> containing 0: user_id 1: login_name 2: phone 3: email 4: nick_name 5: client_id 6: register_time."
-        , extended = "Example:\n> SELECT _FUNC_(headers) FROM src;")
+        , value = "_FUNC_(string, string) - Parses the token and returns an ArrayList<Text> containing 0: user_id 1: login_name 2: phone 3: email 4: nick_name 5: client_id 6: register_time."
+        , extended = "Example:\n> SELECT _FUNC_(headers, cookies) FROM src;")
 public class UDFParseAuthorization extends GenericUDF {
     public static final Logger logger = LoggerFactory.getLogger(UDFParseAuthorization.class);
 
-    private static final int ARG_COUNT = 1;
+    private static final int ARG_COUNT = 2;
     public static final Integer RET_ARRAY_SIZE = 7;
     public static final String SEMICOLON_SEP = ";";
     public static final String COMMA_SEP = ",";
@@ -53,6 +53,23 @@ public class UDFParseAuthorization extends GenericUDF {
     private ObjectInspectorConverters.Converter[] converters;
 
     public UDFParseAuthorization() {}
+
+
+    public static String getAccessTokenFromCookieString(String cookieString) {
+        String[] cookiePairs = cookieString.split("; ");
+        for (String pair : cookiePairs) {
+            String[] keyValue = pair.split("=");
+            if (keyValue.length == 2) {
+                String key = keyValue[0];
+                String value = keyValue[1];
+                if ("access_token".equals(key)) {
+                    return value;
+                }
+            }
+        }
+        return null; // 返回null表示未找到access_token
+    }
+
 
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
@@ -85,9 +102,9 @@ public class UDFParseAuthorization extends GenericUDF {
 
     @Override
     public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        ArrayList<String> result = new ArrayList<>(RET_ARRAY_SIZE);
         assert (arguments.length == ARG_COUNT);
         String headers = converters[0].convert(arguments[0].get()).toString();
+        String cookies = converters[1].convert(arguments[1].get()).toString();
         String token = "";
         // 解析headers中的参数，获取authorization
         for (String header : headers.split("\n")) {
@@ -96,8 +113,24 @@ public class UDFParseAuthorization extends GenericUDF {
                 break;
             }
         }
+
+        // 解析cookies中的参数，获取access_token
+        if (StringUtils.isBlank(token)) {
+            String accessToken = getAccessTokenFromCookieString(cookies);
+            if (StringUtils.isNotBlank(accessToken)) {
+                try {
+                    accessToken = URLDecoder.decode(accessToken, "UTF-8");
+                } catch (Exception e) {
+                    logger.error("解析access_token失败， access_token={}", accessToken, e);
+                }
+            }
+            logger.debug("access_token: {}", accessToken);
+            if (StringUtils.isNotBlank(accessToken)) {
+                token = accessToken;
+            }
+        }
+
         String rstUaStr = RST_UNKNOWN_STR;
-        logger.debug("token: {}", token);
         try {
             rstUaStr = tokenCache.get(token);
         } catch (ExecutionException e) {
@@ -122,15 +155,17 @@ public class UDFParseAuthorization extends GenericUDF {
         try {
             Jwt jwt = JwtHelper.decode(token);
             String claims = jwt.getClaims();
-            if (!StringUtils.startsWith(claims, "{")) {
-                return RST_UNKNOWN_STR;
-            }
             content = JacksonBuilder.mapper.readTree(claims);
         } catch (Exception e) {
             logger.error("解析json字符串异常，请检查原始输入数据: {}", token, e);
             return RST_UNKNOWN_STR;
         }
-        Map<String, JsonNode> result = JacksonBuilder.mapper.convertValue(content, new TypeReference<Map<String, JsonNode>>(){});
+        Map<String, JsonNode> result = new HashMap<>(0);
+        try {
+            result = JacksonBuilder.mapper.convertValue(content, new TypeReference<Map<String, JsonNode>>(){});
+        } catch (Exception e) {
+            logger.error("解析json字符串异常检查原始输入数据: {}", token, e);
+        }
         logger.debug("Result: {}", result);
         JsonNode userNameJsonNode = result.get("user_name");
         if (userNameJsonNode == null) {
@@ -190,19 +225,21 @@ public class UDFParseAuthorization extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String tokenStr = "accept-encoding: gzip, deflate\n" +
-                "connection: keep-alive\n" +
-                "x-waf-uuid: c7e46336c1ab70de220ab8e3971fac14-d239fbf5b68fb4aadd7005b786288140\n" +
-                "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4\n" +
-                "accept: */*";
-        long begin = System.currentTimeMillis();
+//        String tokenStr = "remote-port: 34021\n" +
+//                "authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsicmVzb3VyY2VPbmUiXSwidXNlcl9uYW1lIjp7ImxvZ2luVHlwZSI6ImFkbWluU21zIiwibG9naW5OYW1lIjoiMTg4Njc5NDkwNzMiLCJhcHBJZCI6IkNISU5BX0dPT0RTIiwidW5pb25JZCI6bnVsbCwiYWxpcGF5VXNlcklkIjpudWxsLCJpc0FkbWluIjp0cnVlLCJ3eFVzZXJJZCI6IiIsImdlbmRlciI6IkYiLCJkZWwiOiJOIiwicHJpdmlsZWdlIjoiWSIsInNob3J0UGhvbmUiOiIiLCJ1c2VyTmFtZSI6IueOi-iVviIsInJhbmtJZExpc3QiOlsiV0FOR0xFSSJdLCJsYXN0TG9naW5UaW1lIjoiMjAyMy0wOS0wMVQxNzoxMzo1NiIsInJlYWxOYW1lIjoi546L6JW-IiwibW9kaWZ5VGltZSI6IjIwMjMtMDktMDFUMTc6MTM6NTYiLCJwb3NpdGlvbklkIjo2MjEsImNyZWF0ZVRpbWUiOiIyMDIyLTA2LTE0VDE0OjQxOjE0IiwicGFzc3dkIjoiJDJhJDEwJGwxN0hPTHNDRHQ0RWVsampUTmI4Sk92RHZhUG1KQ0xReDUwUTQucmFqQTVoQWthN1JEb0d5IiwicGhvbmUiOiIxODg2Nzk0OTA3MyIsImxvZ28iOiIiLCJzZWxmIjoiTiIsImlkIjo1MzYxfSwic2NvcGUiOlsiQURNSU4iXSwiZXhwIjoxNjk0NDIzNjQ4LCJhdXRob3JpdGllcyI6WyJXQU5HTEVJIl0sImp0aSI6ImNkMDFhYTE4LTRiMGItNGUyNC1hOTRjLWQwYjUyMDU0OGNmZiIsImNsaWVudF9pZCI6ImFkbWluIn0.qUDPy9DA1qq_KG7FiALO28aLi6ICUqmHe4V003iYjnnpkFHxfDR-LG";
+        String tokenStr = "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4";
+//        String cookies = "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MQ.gSssTBEVe6X9aFEd0H_tt8kk2u7df90W1eOzNRnrsQ4";
+        String cookies = "";
 
+        long begin = System.currentTimeMillis();
         UDFParseAuthorization parseAuth = new UDFParseAuthorization();
         DeferredObject[] deferredObjects = new DeferredObject[2];
         deferredObjects[0] = new DeferredJavaObject(tokenStr);
+        deferredObjects[1] = new DeferredJavaObject(cookies);
 
-        ObjectInspector[] inspectorArr = new ObjectInspector[1];
+        ObjectInspector[] inspectorArr = new ObjectInspector[2];
         inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        inspectorArr[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         parseAuth.initialize(inspectorArr);
         for (int i = 0; i < 1; i++) {
             Object retArr = parseAuth.evaluate(deferredObjects);
