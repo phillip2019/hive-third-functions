@@ -24,18 +24,18 @@ public class UDFStandardUrlFormatTest {
 
     @Test
     public void testUrlEncode() throws Exception {
-//        UDFStandardUrlFormat udf = new UDFStandardUrlFormat();
-//        ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-//        ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-//        ObjectInspector[] arguments = {platform_type, sc_url};
-//        udf.initialize(arguments);
-//
-//        ArrayList<Text> reslist = null;
-//        GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("pc");
-//        GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("https://news.chinagoods.com/information/11/search/减免租金");
-//        GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
-//        reslist = udf.evaluate(args);
-//        System.out.println(reslist);
+        UDFStandardUrlFormat udf = new UDFStandardUrlFormat();
+        ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        ObjectInspector[] arguments = {platform_type, sc_url};
+        udf.initialize(arguments);
+
+        ArrayList<Text> reslist = null;
+        GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("mini_programs");
+        GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("/pages/order/index?activityId=1733823737853022210&shopId=54681");
+        GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
+        reslist = udf.evaluate(args);
+        System.out.println(reslist);
 
 //        String RULE_SQL = "select platform_type,sc_url from test2 where" +
 //                 " sc_url not like 'http://localhost%' " +
