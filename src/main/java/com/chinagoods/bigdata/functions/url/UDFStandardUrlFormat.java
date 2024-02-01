@@ -15,12 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * @author zyl
@@ -90,6 +88,9 @@ public class UDFStandardUrlFormat extends GenericUDF {
     private static final String SEPARATOR = "---";
     private static final String KV_SEPARATOR = "--";
     private static final String KV_VALUE_SEPARATOR = "-";
+    /**
+     * 参数连接分隔符
+     **/
     private static final String CONNECTOR_SEPARATOR = "?";
     private static final String REGEX_OR_PARAM_SEPARATOR = "/&/";
     private static final String BACKSLASH = "/";
@@ -165,33 +166,45 @@ public class UDFStandardUrlFormat extends GenericUDF {
     @Override
     public ArrayList<Text> evaluate(DeferredObject[] arguments) throws HiveException {
         assert (arguments.length == ARG_COUNT);
+        // 初始化参数值
         initParam();
-        String scUrl;
+
+        String scUrl = converters[0].convert(arguments[1].get()).toString();
         platFormType = converters[0].convert(arguments[0].get()).toString();
-        if(platFormType.equals(MINI_PROGRAMS)){
-            scUrl = "https://www.chinagoods.com"+converters[0].convert(arguments[1].get()).toString();
-        }else{
-            scUrl = converters[0].convert(arguments[1].get()).toString();
+
+        // 针对小程序，由于scUrl=pages/search/categoryProduct类型，添加url前缀进行匹配
+        if(platFormType.equals(MINI_PROGRAMS)) {
+            scUrl = String.format("https://www.chinagoods.com/%s", scUrl);
         }
+
+        // 若访问地址为空或者客户端名称为空，则直接返回空结果
         if (StringUtils.isBlank(scUrl) || StringUtils.isBlank(platFormType)) {
             return resultPageNameList;
         }
-        //标准化url
-        if (scUrl.contains(HTTP_PREFIX)) {
-            scUrl = scUrl.replace(HTTP_PREFIX, HTTPS_PREFIX);
+
+        // 标准化url，将http转换成https
+        if (scUrl.startsWith(HTTP_PREFIX)) {
+            scUrl = scUrl.replaceFirst(HTTP_PREFIX, HTTPS_PREFIX);
         }
+
         if (scUrl.contains(HTTPS_PREFIX)) {
+            // 若scUrl中含？并且不包含=http或=https内容，则针对scUrl进行拼接，保证requestPath以/结尾
             if (scUrl.contains(CONNECTOR_SEPARATOR) && !scUrl.contains(EQ + HTTP_PREFIX) && !scUrl.contains(EQ + HTTPS_PREFIX)) {
                 String requestUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
                 String requestUrlParam = scUrl.substring(scUrl.indexOf(CONNECTOR_SEPARATOR));
                 scUrl = requestUrl.lastIndexOf(BACKSLASH) + 1 == requestUrl.length() ? scUrl : requestUrl + BACKSLASH + requestUrlParam;
             } else if (scUrl.contains(CONNECTOR_SEPARATOR) && (scUrl.contains(EQ + HTTP_PREFIX) || scUrl.contains(EQ + HTTPS_PREFIX))) {
-                scUrl = scUrl + BACKSLASH;
+                // 截取第一个?位置前字符串内容
+                String requestPath = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
+                String requestParam = scUrl.substring(scUrl.indexOf(CONNECTOR_SEPARATOR));
+                scUrl = requestPath.lastIndexOf(BACKSLASH) + 1 == requestPath.length() ? scUrl : requestPath + BACKSLASH + requestParam;
             } else {
                 scUrl = scUrl.lastIndexOf(BACKSLASH) + 1 == scUrl.length() ? scUrl : scUrl + BACKSLASH;
             }
         }
-        meunDealUrl(scUrl);
+        // 处理菜单URL
+        resultPageNameList = menuDealUrl(scUrl);
+        // 处理特殊参数URL
         resultPageNameList = specialParamDealUrl(scUrl);
         if (resultPageNameList.get(0).toString().equals(STANDARD_ZERO)) {
             resultPageNameList = regexDealUrl(scUrl);
@@ -263,84 +276,90 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 处理菜单URL
      *
-     * @param scUrl
-     * @return
+     * @param scUrl 原始连接请求地址
+     * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<Text> meunDealUrl(String scUrl) throws HiveException {
+    public ArrayList<Text> menuDealUrl(String scUrl) throws HiveException {
         try {
-            //菜单固定参数
-            if (StringUtils.contains(scUrl, Z) || StringUtils.contains(scUrl, T) || StringUtils.contains(scUrl, M) || StringUtils.contains(scUrl, S) || StringUtils.contains(scUrl, C)) {
-                //遍历菜单URL
+            // 菜单固定参数
+            if (Stream.of(Z, T, M, S, C).anyMatch(e -> StringUtils.contains(scUrl, e))) {
+                // 遍历菜单URL
+                // TODO 后续避免遍历，采用性能更高方式，达到O(1)方式获取
                 for (List<String> ls : menuUrlList) {
-                    //当URL时菜单路径
-                    if (StringUtils.contains(scUrl, ls.get(0))) {
+                    // 特殊url参数列表: url,fixed_identity,fixed_param,mapping_key,unit,sub_unit,url_param_keys,param_type,page_link_name
+                    //当URL是菜单路径
+                    String specialUrlPath = ls.get(0);
+                    if (StringUtils.contains(scUrl, specialUrlPath)) {
                         unit = ls.get(4);
                         subUnit = ls.get(5);
                         String pageLinkName = ls.get(8);
                         //当URL包含多个key
-                        int indexStart = scUrl.lastIndexOf(ls.get(0)) + ls.get(0).length();
+                        int indexStart = scUrl.lastIndexOf(specialUrlPath) + specialUrlPath.length();
                         int indexEnd = scUrl.lastIndexOf(BACKSLASH);
-                        String paramUrl = scUrl.substring(indexStart, indexEnd).toLowerCase();
-                        if (paramUrl.contains(SEPARATOR)) {
+                        String menuUrlParam = scUrl.substring(indexStart, indexEnd).toLowerCase();
+                        if (menuUrlParam.contains(SEPARATOR)) {
+                            // 固定参数
                             List<String> nameList = new ArrayList<>();
-                            //search搜索存在搜索后筛选的情况，给固定格式
-                            if (paramUrl.contains(BACKSLASH)) {
-                                nameList.add(paramUrl.substring(0, paramUrl.indexOf(BACKSLASH)));
-                                paramUrl = paramUrl.substring(paramUrl.indexOf(BACKSLASH) + 1, paramUrl.length());
+                            // search搜索存在搜索后筛选的情况，给固定格式
+                            if (menuUrlParam.contains(BACKSLASH)) {
+                                nameList.add(menuUrlParam.substring(0, menuUrlParam.indexOf(BACKSLASH)));
+                                menuUrlParam = menuUrlParam.substring(menuUrlParam.indexOf(BACKSLASH) + 1);
                             }
-                            String[] keysArr = paramUrl.split(SEPARATOR);
-                            for (String key : keysArr) {
-                                String upKey=key.toUpperCase();
-                                if(upKey.contains(EY) || upKey.contains(VL) || upKey.contains(SF) || upKey.contains(LT)
-                                    || upKey.contains(S) || upKey.contains(IMT) || upKey.contains(P) || upKey.contains(I)
-                                    || upKey.contains(HR) || upKey.contains(EP)){
+                            String[] keysArr = menuUrlParam.split(SEPARATOR);
+                            for (String specialParam : keysArr) {
+                                String upSpecialParam = specialParam.toUpperCase();
+                                // 若upKey中包含EY、VL、SF、LT、S、IMT、P、I、HR、EP字符串，则跳过，此为搜索类型key
+                                if (Stream.of(EY, VL, SF, LT, S, IMT, P, I, HR, EP).anyMatch(e -> StringUtils.contains(upSpecialParam, e))) {
                                     continue;
                                 }
-                                if((key.contains(C.toLowerCase()) || key.contains(M.toLowerCase())) && scUrl.contains(MULTIPLE_URL)){
-                                    String mOrC=key.split(KV_SEPARATOR)[0];
-                                    String value=EMPTY;
-                                    if(key.contains(C.toLowerCase())){
-                                        value=key.replace(C.toLowerCase(),EMPTY);
+                                boolean isAddNameListFlag = false;
+                                if ((upSpecialParam.contains(C) || upSpecialParam.contains(M)) && scUrl.contains(MULTIPLE_URL)) {
+                                    // upSpecialParam举例为T--446
+                                    String mOrCKey = upSpecialParam.split(KV_SEPARATOR)[0];
+                                    String value = EMPTY;
+                                    if ( upSpecialParam.contains(C) ) {
+                                        value = upSpecialParam.replaceFirst(C, EMPTY).toLowerCase();
+                                    } else if ( upSpecialParam.contains(M) ) {
+                                        value = upSpecialParam.replaceFirst(M, EMPTY).toLowerCase();
                                     }
-                                    if(key.contains(M.toLowerCase())){
-                                        value=key.replace(M.toLowerCase(),EMPTY);
-                                    }
-                                    if(value.contains(KV_VALUE_SEPARATOR)){
-                                        String[]arr=value.split(KV_VALUE_SEPARATOR);
-                                        if(arr.length > 0) {
-                                            for (String v : arr) {
-                                                String res=paramKvMap.get(mOrC + KV_SEPARATOR + v);
-                                                if(StringUtils.isNotBlank(res)){
-                                                    nameList.add(res);
-                                                }
+                                    if (value.contains(KV_VALUE_SEPARATOR)) {
+                                        isAddNameListFlag = true;
+                                        String[] valueArr = value.split(KV_VALUE_SEPARATOR);
+                                        String specialParamKeyTpl = "%s" + KV_SEPARATOR + "%s";
+                                        for (String v : valueArr) {
+                                            String res = paramKvMap.get(String.format(specialParamKeyTpl, mOrCKey, v).toLowerCase());
+                                            if (StringUtils.isNotBlank(res)) {
+                                                nameList.add(res);
                                             }
                                         }
-                                        continue;
                                     }
                                 }
-                                nameList.add(paramKvMap.get(key));
+
+                                if (!isAddNameListFlag) {
+                                    nameList.add(paramKvMap.get(specialParam));
+                                }
                             }
                             pageName = String.join(SEPARATOR, nameList);
                         } else {
-                            pageName = paramKvMap.get(paramUrl);
+                            pageName = paramKvMap.get(menuUrlParam);
                         }
-                        setListValue(scUrl, unit, subUnit, pageName, pageLinkName);
+
+                        setResultListValue(scUrl, unit, subUnit, pageName, pageLinkName);
                         break;
                     }
                 }
             }
         } catch (Exception e) {
             logger.error("Menu URL handling error,url is {},error is ", scUrl, e);
-            throw new HiveException("Menu URL handling error,url is " + scUrl + ",error is ", e);
+            throw new HiveException(String.format("Menu URL handling error, url is %s,error is ", scUrl), e);
         }
         return resultPageNameList;
     }
 
     /**
      * 处理特殊固定参数的URL和无正则url处理
-     *
-     * @param scUrl
-     * @return
+     * @param scUrl 原始连接请求地址
+     * @return 处理后的菜单URL， 结果对象
      */
     public ArrayList<Text> specialParamDealUrl(String scUrl) throws HiveException {
         try {
@@ -433,7 +452,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                     }
                     newScUrl = newScUrl.lastIndexOf(BACKSLASH) + 1 == newScUrl.length() ? newScUrl : newScUrl + BACKSLASH;
                     if (newScUrl.equals(standardUrl)) {
-                        setListValue(standardUrl, unit, subUnit, pageName, null);
+                        setResultListValue(standardUrl, unit, subUnit, pageName, null);
                         return resultPageNameList;
                     }
                 }
@@ -455,7 +474,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
         String pageSeparatorName = staticUrlMap.get(standardUrl.toLowerCase());
         if (!StringUtils.isBlank(pageSeparatorName)) {
             String[] pageNameArr = pageSeparatorName.split(SEPARATOR);
-            setListValue(standardUrl, pageNameArr[0], pageNameArr[1], pageNameArr[2], pageLinkName);
+            setResultListValue(standardUrl, pageNameArr[0], pageNameArr[1], pageNameArr[2], pageLinkName);
         }
     }
 
@@ -478,16 +497,14 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     /**
-     * 返回结果赋值
-     *
+     * 设置返回结果
      * @param standardUrl 标准url
      * @param unit 一级模块
      * @param subUnit 二级模块
      * @param pageName 页面名称
      * @param pageLinkName 页面链接名
-     * @return
      */
-    public void setListValue(String standardUrl, String unit, String subUnit, String pageName, String pageLinkName) {
+    public void setResultListValue(String standardUrl, String unit, String subUnit, String pageName, String pageLinkName) {
         if (StringUtils.isNotBlank(standardUrl) && StringUtils.isNotBlank(unit) && StringUtils.isNotBlank(subUnit)
                 && StringUtils.isNotBlank(pageName)) {
             resultPageNameList.set(0, new Text(standardUrl));
@@ -551,7 +568,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String url = "https://www.chinagoods.com/activies/special/?code=";
+        String url = "https://www.chinagoods.com/search/categoryProduct/T--446---C--694---S--1---M--01";
         UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat();
         DeferredObject[] deferredObjects = new DeferredObject[2];
         // 平台类型、sc_url
