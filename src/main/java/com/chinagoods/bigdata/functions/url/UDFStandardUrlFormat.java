@@ -51,11 +51,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * 标准url匹配规则信息
      */
     private static final String RULE_SQL = "select platform_type,case when standard_url like '%://h%' then 'Y' else 'N' end is_h5,standard_url, regex, unit,sub_unit,page_name,params from standard_rule_url " +
-            "where lang = 'zh' and unit is not null and sub_unit is not null and page_name is not null and platform_type is not null and sc_url!='' and regex is not null and regex!=''";
+            "where unit is not null and sub_unit is not null and page_name is not null and platform_type is not null and sc_url!='' and regex is not null and regex!=''";
     /**
      * 静态URL信息
      */
-    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where lang = 'zh' and (regex is null or regex = '') and standard_url is not null";
+    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where (regex is null or regex = '') and standard_url is not null ";
     /**
      * 特殊URL信息
      **/
@@ -128,6 +128,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
 
     private static final String STANDARD_ZERO = "0000";
     private static final String H5 = "h5";
+    private static final String MINI_PROGRAMS = "mini_programs";
+
     private static final String FIXED_PARAM = "fixed_param";
     /**
      * 返回结果list元素
@@ -166,7 +168,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
         initParam();
         String scUrl;
         platFormType = converters[0].convert(arguments[0].get()).toString();
-        scUrl = converters[0].convert(arguments[1].get()).toString();
+        if(platFormType.equals(MINI_PROGRAMS)){
+            scUrl = "https://www.chinagoods.com"+converters[0].convert(arguments[1].get()).toString();
+        }else{
+            scUrl = converters[0].convert(arguments[1].get()).toString();
+        }
         if (StringUtils.isBlank(scUrl) || StringUtils.isBlank(platFormType)) {
             return resultPageNameList;
         }
