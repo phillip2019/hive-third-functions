@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
         , extended = "Example:\n> SELECT _FUNC_(platform_type,sc_url) FROM src;")
 public class UDFStandardUrlFormat extends GenericUDF {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
-    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://172.18.5.10:23307/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     /**
@@ -55,7 +55,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 静态URL信息
      */
-    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where lang = 'zh' and (regex is null or regex = '') and standard_url is not null";
+    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where lang = 'zh' and (regex is null or regex = '') and standard_url is not null and unit='test1'";
     /**
      * 特殊URL信息
      **/
@@ -128,6 +128,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
 
     private static final String STANDARD_ZERO = "0000";
     private static final String H5 = "h5";
+    private static final String MINI_PROGRAMS = "mini_programs";
+
     private static final String FIXED_PARAM = "fixed_param";
     /**
      * 返回结果list元素
@@ -166,7 +168,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
         initParam();
         String scUrl;
         platFormType = converters[0].convert(arguments[0].get()).toString();
-        scUrl = converters[0].convert(arguments[1].get()).toString();
+        if(platFormType.equals(MINI_PROGRAMS)){
+            scUrl = "https://www.chinagoods.com"+converters[0].convert(arguments[1].get()).toString();
+        }else{
+            scUrl = converters[0].convert(arguments[1].get()).toString();
+        }
         if (StringUtils.isBlank(scUrl) || StringUtils.isBlank(platFormType)) {
             return resultPageNameList;
         }
