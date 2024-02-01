@@ -51,11 +51,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * 标准url匹配规则信息
      */
     private static final String RULE_SQL = "select platform_type,case when standard_url like '%://h%' then 'Y' else 'N' end is_h5,standard_url, regex, unit,sub_unit,page_name,params from standard_rule_url " +
-            "where lang = 'zh' and unit is not null and sub_unit is not null and page_name is not null and platform_type is not null and sc_url!='' and regex is not null and regex!=''";
+            "where unit is not null and sub_unit is not null and page_name is not null and platform_type is not null and sc_url!='' and regex is not null and regex!=''";
     /**
      * 静态URL信息
      */
-    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where lang = 'zh' and (regex is null or regex = '') and standard_url is not null and unit='test1'";
+    private static final String STATIC_URL_SQL = "select standard_url, concat(unit,'---',sub_unit,'---',page_name) url_name from standard_rule_url where (regex is null or regex = '') and standard_url is not null ";
     /**
      * 特殊URL信息
      **/
