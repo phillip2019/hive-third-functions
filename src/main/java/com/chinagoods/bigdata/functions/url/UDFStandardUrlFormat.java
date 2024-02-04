@@ -405,6 +405,10 @@ public class UDFStandardUrlFormat extends GenericUDF {
                 String host = urls.getHost();
                 if (scUrl.contains(fixedIdentity) && url.contains(host)) {
                     standardUrl = scUrl;
+                    int scUrlConnectorSeparatorPos = scUrl.length();
+                    if (scUrl.indexOf(CONNECTOR_SEPARATOR) > 0) {
+                        scUrlConnectorSeparatorPos = scUrl.indexOf(CONNECTOR_SEPARATOR);
+                    }
                     // param_type 1: 参数 2: url
                     if (paramType.equals(ONE)) {
                         // url中请求参数不为空，进行请求参数解析,获取请求参数对应的值
@@ -414,11 +418,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
                             List<String> urlPathAndParams = getUrlPathAndParams(scUrl, urlParamKeysArray);
                             standardUrl = String.join(CONNECTOR_SEPARATOR, urlPathAndParams.get(0), String.join(PARAM_SEPARATOR, urlPathAndParams.subList(1, urlPathAndParams.size())));
                         } else if (!url.contains(CONNECTOR_SEPARATOR)) {
-                            standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
+                            standardUrl = scUrl.substring(0, scUrlConnectorSeparatorPos);
                         }
                     } else if (paramType.equals(TWO)) {
                         if (!url.contains(CONNECTOR_SEPARATOR)) {
-                            standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR) > 0 ? scUrl.indexOf(CONNECTOR_SEPARATOR) : scUrl.length());
+                            standardUrl = scUrl.substring(0, scUrlConnectorSeparatorPos);
                         }
                     }
 
@@ -587,7 +591,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String url = "https://news.chinagoods.com/information/10/20210709094531/";
+        String url = "https://m.chinagoods.com/act/eyJVbmlxdWVJZCI6Njc1LCJMYW5ndWFnZSI6InpoLUNOIiwiRGV2aWNlIjoicGhvbmUiLCJOYW1lIjoiIn0=/";
         ArrayList<Text> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
