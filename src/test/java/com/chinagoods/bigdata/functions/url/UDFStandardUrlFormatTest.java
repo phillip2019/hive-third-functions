@@ -1,11 +1,7 @@
 package com.chinagoods.bigdata.functions.url;
 
-import com.chinagoods.bigdata.functions.utils.MysqlUtil;
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.Text;
 import org.junit.Test;
@@ -13,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class UDFStandardUrlFormatTest {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
@@ -23,19 +17,23 @@ public class UDFStandardUrlFormatTest {
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
 
     @Test
-    public void testUrlEncode() throws Exception {
-        UDFStandardUrlFormat udf = new UDFStandardUrlFormat();
-        ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-        ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-        ObjectInspector[] arguments = {platform_type, sc_url};
-        udf.initialize(arguments);
+    public void testMiniProgramsUrl() throws Exception {
+        ArrayList<Text> resList;
+        try (UDFStandardUrlFormat udf = new UDFStandardUrlFormat()) {
+            ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+            ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+            ObjectInspector[] arguments = {platform_type, sc_url};
+            udf.initialize(arguments);
 
-        ArrayList<Text> reslist = null;
-        GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("mini_programs");
-        GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("/pages/order/index?activityId=1733823737853022210&shopId=54681");
-        GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
-        reslist = udf.evaluate(args);
-        System.out.println(reslist);
+            resList = null;
+            GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("mini_programs");
+            GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("pages/order/index?activityId=1733823737853022210&shopId=54681");
+            GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
+            resList = udf.evaluate(args);
+            assert new Text("智慧名片").equals(resList.get(1));
+            assert new Text("支付有礼").equals(resList.get(2));
+            assert new Text("红包活动下单页").equals(resList.get(3));
+        }
 
 //        String RULE_SQL = "select platform_type,sc_url from test2 where" +
 //                 " sc_url not like 'http://localhost%' " +
