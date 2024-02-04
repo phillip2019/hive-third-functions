@@ -298,7 +298,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<String> menuDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> menuDealUrl(String scUrl) throws HiveException {
         // 菜单固定参数
         try {
             // 遍历菜单URL
@@ -382,7 +382,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<String> specialParamDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> specialParamDealUrl(String scUrl) throws HiveException {
         try {
             // 区分是否特殊URL
             // 特殊url参数列表: url,fixed_identity,fixed_param,mapping_key,unit,sub_unit,url_param_keys,param_type,page_link_name
@@ -451,7 +451,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<String> regexDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> regexDealUrl(String scUrl) throws HiveException {
         String h5Key = scUrl.startsWith(HTTPS_H5_PREFIX) ? H5 : EMPTY;
         String fullPlatformType = String.format("%s%s", platformType, h5Key);
         try {
@@ -496,7 +496,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param standardUrl  标准url
      * @param pageLinkName 页面链接名称
      */
-    public void staticDealUrl(final String standardUrl, final String pageLinkName) {
+    public void staticDealUrl(String standardUrl, String pageLinkName) {
         String pageSeparatorName = staticUrlMap.get(standardUrl.toLowerCase());
         if (!StringUtils.isBlank(pageSeparatorName)) {
             String[] pageNameArr = pageSeparatorName.split(SEPARATOR);
@@ -562,7 +562,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param keyArr 参数数组
      * @return Map<String, List < String>> 请求参数映射表, 返回urlPath, 参数列表
      */
-    public static List<String> getUrlPathAndParams(final String scUrl, final String[] keyArr) {
+    public static List<String> getUrlPathAndParams(String scUrl, String[] keyArr) {
         List<String> urlPathAndParams = new ArrayList<>(4);
 
         String scUrlPath;
@@ -599,8 +599,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-//        String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
-        String url = "https://h5.chinagoods.com/enterYiwu/venue/";
+        String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
+//        String url = "https://h5.chinagoods.com/enterYiwu/venue/";
         ArrayList<String> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
