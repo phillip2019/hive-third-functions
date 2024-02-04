@@ -215,10 +215,14 @@ public class UDFStandardUrlFormat extends GenericUDF {
             }
         }
         // 处理菜单URL
-        final AtomicReference<String> scUrlRef = new AtomicReference<>(scUrl);
-        if (Stream.of(Z, T, M, S, C).anyMatch(e -> StringUtils.contains(scUrlRef.get(), e))) {
+//        final AtomicReference<String> scUrlRef = new AtomicReference<>(scUrl);
+        if (StringUtils.contains(scUrl, Z) || StringUtils.contains(scUrl, T) || StringUtils.contains(scUrl, M) || StringUtils.contains(scUrl, S) || StringUtils.contains(scUrl, C)) {
             resultPageNameList = menuDealUrl(scUrl);
-        } else {
+        }
+//        if (Stream.of(Z, T, M, S, C).anyMatch(e -> StringUtils.contains(scUrlRef.get(), e))) {
+//            resultPageNameList = menuDealUrl(scUrl);
+//        }
+        else {
             // 处理特殊参数URL和部分静态原始地址
             resultPageNameList = specialParamDealUrl(scUrl);
         }
