@@ -418,7 +418,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                         }
                     } else if (paramType.equals(TWO)) {
                         if (!url.contains(CONNECTOR_SEPARATOR)) {
-                            standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
+                            standardUrl = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR) > 0 ? scUrl.indexOf(CONNECTOR_SEPARATOR) : scUrl.length());
                         }
                     }
 
@@ -430,8 +430,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error handling special parameter url, url is {}, error is ", scUrl, e);
-            throw new HiveException("Error handling special parameter url, url is " + scUrl + ",error is ", e);
+            logger.error("Error handling special parameter scUrl, scUrl is {}, error is ", scUrl, e);
+            throw new HiveException("Error handling special parameter scUrl, scUrl is " + scUrl + ",error is ", e);
         }
         return resultPageNameList;
     }
@@ -587,7 +587,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String url = "https://www.chinagoods.com/search/categoryProduct/T--446---C--694---S--1---M--01";
+        String url = "https://news.chinagoods.com/information/10/20210709094531/";
         ArrayList<Text> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
