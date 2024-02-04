@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -214,8 +215,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
             }
         }
         // 处理菜单URL
-        String finalScUrl = scUrl;
-        if (Stream.of(Z, T, M, S, C).anyMatch(e -> StringUtils.contains(finalScUrl, e))) {
+        final AtomicReference<String> scUrlRef = new AtomicReference<>(scUrl);
+        if (Stream.of(Z, T, M, S, C).anyMatch(e -> StringUtils.contains(scUrlRef.get(), e))) {
             resultPageNameList = menuDealUrl(scUrl);
         } else {
             // 处理特殊参数URL和部分静态原始地址
@@ -370,7 +371,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
             }
         } catch (Exception e) {
             logger.error("Menu URL handling error,url is {},error is ", scUrl, e);
-//            throw new HiveException(String.format("Menu URL handling error, url is %s,error is ", scUrl), e);
+            throw new HiveException(String.format("Menu URL handling error, url is %s,error is ", scUrl), e);
         }
         return resultPageNameList;
     }
@@ -566,7 +567,12 @@ public class UDFStandardUrlFormat extends GenericUDF {
 
         String scUrlPath;
         if (StringUtils.isNotBlank(scUrl) && keyArr.length > 0) {
-            scUrlPath = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
+            // 处理posIndex
+            int posIndex = scUrl.indexOf(CONNECTOR_SEPARATOR);
+            if (posIndex == -1) {
+                posIndex = scUrl.length();
+            }
+            scUrlPath = scUrl.substring(0, posIndex);
             urlPathAndParams.add(scUrlPath);
             for (String key : keyArr) {
                 Pattern pattern = Pattern.compile(key + "=([^&]*)");
@@ -593,7 +599,8 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
+//        String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
+        String url = "https://h5.chinagoods.com/enterYiwu/venue/";
         ArrayList<String> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
