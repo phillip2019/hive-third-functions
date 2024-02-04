@@ -28,8 +28,14 @@ import java.util.stream.Stream;
  * time: 16:30
  * describe: 此函数从基础规则表standard_rule_url，特殊url规则表standard_special_url查询相关规则进行匹配
  * 上述规则数据基于k-v映射表standard_url_param_maping动态生成固定url相关数据，参考见数据库触发器standard_url_param_maping_trigger（依赖于market_industry，sys_map，category，venue，active_meeting，cms_category，cms_article表数据）
- * standard_rule_url配置：1.无参url（包含参数在url中，不在问号后的）不用配置正则 2.有参url按照正则替换，正则可多个，用/&/分割，params参数也用/&/分割，空使用NULL字符串代替，其他使用0000代替 3.正则中\\使用\ 4.规则配置时，如果原始url符合特殊url表standard_special_url中规则，则正则表达式字段不能为空，否则处理不了
- * standard_special_url配置：1、url,unit,sub_unit必填 2.前置条件param_type为1代表参数替换；fixed_identity代表url包含这个字符串就是按照次规则匹配 3.fixed_param字段参数包含0000，用mapping_key的key中---后的部分替换0000部分；值为fixed_param字符串的，则使用mapping_key的key中---后的部分直接替换fixed_param，如果url_param_keys有值，则按照顺序拼接作为参数直接替换fixed_param（如code=112&active_code=112&id=3）3.前置条件param_type为2代表参数替换；用mapping_key的key中---后的部分替换fixed_param；4.mapping_key的标识必须和standard_url_param_maping中的key_desc的前缀保持一致
+ * standard_rule_url配置：1.无参url（包含参数在url中，不在问号后的）不用配置正则
+ *                       2.有参url按照正则替换，正则可多个，用/&/分割，params参数也用/&/分割，空使用NULL字符串代替，其他使用0000代替
+ *                       3.正则中\\使用\
+ *                       4.规则配置时，如果原始url符合特殊url表standard_special_url中规则，则正则表达式字段不能为空，否则处理不了
+ * standard_special_url配置：1、url,unit,sub_unit必填
+ *                          2.前置条件param_type为1代表参数替换；fixed_identity代表url包含这个字符串就是按照次规则匹配
+ *                          3.fixed_param字段参数包含0000，用mapping_key的key中---后的部分替换0000部分；值为fixed_param字符串的，则使用mapping_key的key中---后的部分直接替换fixed_param，如果url_param_keys有值，则按照顺序拼接作为参数直接替换fixed_param（如code=112&active_code=112&id=3）
+ *                          3.前置条件param_type为2代表参数替换；用mapping_key的key中---后的部分替换fixed_param；4.mapping_key的标识必须和standard_url_param_maping中的key_desc的前缀保持一致
  */
 @Description(name = "standard_url_format"
         , value = "_FUNC_(string,string) - Normalize the url according to the rule, returning an array of processed urls and a tertiary directory name if present, or an array of default values if absent"
