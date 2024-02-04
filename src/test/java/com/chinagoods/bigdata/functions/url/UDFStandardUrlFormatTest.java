@@ -18,7 +18,7 @@ public class UDFStandardUrlFormatTest {
 
     @Test
     public void testMiniProgramsUrl() throws Exception {
-        ArrayList<Text> resList;
+        ArrayList<String> resList;
         try (UDFStandardUrlFormat udf = new UDFStandardUrlFormat()) {
             ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
             ObjectInspector sc_url = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -30,9 +30,9 @@ public class UDFStandardUrlFormatTest {
             GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("pages/order/index?activityId=1733823737853022210&shopId=54681");
             GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
             resList = udf.evaluate(args);
-            assert new Text("智慧名片").equals(resList.get(1));
-            assert new Text("支付有礼").equals(resList.get(2));
-            assert new Text("红包活动下单页").equals(resList.get(3));
+            assert "智慧名片".equals(resList.get(1));
+            assert "支付有礼".equals(resList.get(2));
+            assert "红包活动下单页".equals(resList.get(3));
         }
 
 //        String RULE_SQL = "select platform_type,sc_url from test2 where" +

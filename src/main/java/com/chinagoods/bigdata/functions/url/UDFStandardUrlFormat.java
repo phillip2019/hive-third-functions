@@ -145,14 +145,14 @@ public class UDFStandardUrlFormat extends GenericUDF {
     /**
      * 返回结果list元素
      */
-    private String platformType = null;
-    private String standardUrl = null;
-    private String unit = null;
-    private String subUnit = null;
-    private String pageName = null;
-    private String regex = null;
-    private String params = null;
-    private ArrayList<Text> resultPageNameList = null;
+    private volatile String platformType = null;
+    private volatile String standardUrl = null;
+    private volatile String unit = null;
+    private volatile String subUnit = null;
+    private volatile String pageName = null;
+    private volatile String regex = null;
+    private volatile String params = null;
+    private ArrayList<String> resultPageNameList = new ArrayList<>(4);
     public static final String MULTIPLE_URL = "search/categoryProduct";
 
     public UDFStandardUrlFormat() {
@@ -169,12 +169,13 @@ public class UDFStandardUrlFormat extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
+        // 初始化标准化url规则，加载URL规则
         initRules();
         return ObjectInspectorFactory.getStandardListObjectInspector(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
     }
 
     @Override
-    public ArrayList<Text> evaluate(DeferredObject[] arguments) throws HiveException {
+    public ArrayList<String> evaluate(DeferredObject[] arguments) throws HiveException {
         assert (arguments.length == ARG_COUNT);
         // 初始化参数值
         initParam();
@@ -222,7 +223,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
         }
 
         // 页面名称列表结果若为空，则进行正则判断处理
-        if (resultPageNameList.get(0).toString().equals(STANDARD_ZERO)) {
+        if (resultPageNameList.get(0).equals(STANDARD_ZERO)) {
             // 正则处理页面原始url地址
             resultPageNameList = regexDealUrl(scUrl);
         }
@@ -296,7 +297,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<Text> menuDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> menuDealUrl(final String scUrl) throws HiveException {
         // 菜单固定参数
         try {
             // 遍历菜单URL
@@ -369,7 +370,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
             }
         } catch (Exception e) {
             logger.error("Menu URL handling error,url is {},error is ", scUrl, e);
-            throw new HiveException(String.format("Menu URL handling error, url is %s,error is ", scUrl), e);
+//            throw new HiveException(String.format("Menu URL handling error, url is %s,error is ", scUrl), e);
         }
         return resultPageNameList;
     }
@@ -380,7 +381,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<Text> specialParamDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> specialParamDealUrl(final String scUrl) throws HiveException {
         try {
             // 区分是否特殊URL
             // 特殊url参数列表: url,fixed_identity,fixed_param,mapping_key,unit,sub_unit,url_param_keys,param_type,page_link_name
@@ -449,7 +450,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * @param scUrl 原始连接请求地址
      * @return 处理后的菜单URL， 结果对象
      */
-    public ArrayList<Text> regexDealUrl(final String scUrl) throws HiveException {
+    public ArrayList<String> regexDealUrl(final String scUrl) throws HiveException {
         String h5Key = scUrl.startsWith(HTTPS_H5_PREFIX) ? H5 : EMPTY;
         String fullPlatformType = String.format("%s%s", platformType, h5Key);
         try {
@@ -506,7 +507,6 @@ public class UDFStandardUrlFormat extends GenericUDF {
      * 初始化变量
      */
     public void initParam() {
-
         platformType = null;
         standardUrl = null;
         unit = null;
@@ -514,12 +514,11 @@ public class UDFStandardUrlFormat extends GenericUDF {
         pageName = null;
         regex = null;
         params = null;
-
-        resultPageNameList = new ArrayList<>(4);
-        resultPageNameList.add(new Text(STANDARD_ZERO));
-        resultPageNameList.add(new Text(STANDARD_ZERO));
-        resultPageNameList.add(new Text(STANDARD_ZERO));
-        resultPageNameList.add(new Text(STANDARD_ZERO));
+        resultPageNameList.clear();
+        resultPageNameList.add(STANDARD_ZERO);
+        resultPageNameList.add(STANDARD_ZERO);
+        resultPageNameList.add(STANDARD_ZERO);
+        resultPageNameList.add(STANDARD_ZERO);
     }
 
     /**
@@ -534,10 +533,10 @@ public class UDFStandardUrlFormat extends GenericUDF {
     public void setResultListValue(String standardUrl, String unit, String subUnit, String pageName, String pageLinkName) {
         if (StringUtils.isNotBlank(standardUrl) && StringUtils.isNotBlank(unit) && StringUtils.isNotBlank(subUnit)
                 && StringUtils.isNotBlank(pageName)) {
-            resultPageNameList.set(0, new Text(standardUrl));
-            resultPageNameList.set(1, new Text(unit));
-            resultPageNameList.set(2, new Text(subUnit));
-            resultPageNameList.set(3, new Text(pageName + (pageLinkName == null ? "" : pageLinkName)));
+            resultPageNameList.set(0, standardUrl);
+            resultPageNameList.set(1, unit);
+            resultPageNameList.set(2, subUnit);
+            resultPageNameList.set(3, pageName + (pageLinkName == null ? "" : pageLinkName));
         }
     }
 
@@ -595,7 +594,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
 
     public static void main(String[] args) throws HiveException {
         String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
-        ArrayList<Text> retArr;
+        ArrayList<String> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
             // 平台类型、sc_url
