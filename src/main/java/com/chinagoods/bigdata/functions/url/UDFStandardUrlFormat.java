@@ -207,7 +207,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                 // 截取第一个?位置前字符串内容
                 String requestPath = scUrl.substring(0, scUrl.indexOf(CONNECTOR_SEPARATOR));
                 String requestParam = scUrl.substring(scUrl.indexOf(CONNECTOR_SEPARATOR));
-                scUrl = requestPath.lastIndexOf(BACKSLASH) + 1 == requestPath.length() ? scUrl : requestPath + BACKSLASH + requestParam;
+                scUrl = requestPath.lastIndexOf(BACKSLASH) + 1 == requestPath.length() ? requestPath : requestPath + BACKSLASH + requestParam;
             } else {
                 scUrl = scUrl.lastIndexOf(BACKSLASH) + 1 == scUrl.length() ? scUrl : scUrl + BACKSLASH;
             }
@@ -312,6 +312,9 @@ public class UDFStandardUrlFormat extends GenericUDF {
                     //当URL包含多个key
                     int indexStart = scUrl.lastIndexOf(specialUrlPath) + specialUrlPath.length();
                     int indexEnd = scUrl.lastIndexOf(BACKSLASH);
+                    if (indexEnd < 0) {
+                        indexEnd = scUrl.length();
+                    }
                     String menuUrlParam = scUrl.substring(indexStart, indexEnd).toLowerCase();
                     if (menuUrlParam.contains(SEPARATOR)) {
                         // 固定参数
@@ -591,7 +594,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String url = "https://m.chinagoods.com/act/eyJVbmlxdWVJZCI6Njc1LCJMYW5ndWFnZSI6InpoLUNOIiwiRGV2aWNlIjoicGhvbmUiLCJOYW1lIjoiIn0=/";
+        String url = "https://www.chinagoods.com/login/?return_url=https://www.chinagoods.com/search/categoryProduct/T--401---C--402---S--1---P--3---I--20";
         ArrayList<Text> retArr;
         try (UDFStandardUrlFormat urlFormat = new UDFStandardUrlFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
