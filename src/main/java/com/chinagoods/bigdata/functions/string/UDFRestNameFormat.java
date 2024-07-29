@@ -47,6 +47,8 @@ public class UDFRestNameFormat extends GenericUDF {
     private CacheLoader<String, List<List<String>>> uaLoader = null;
     public LoadingCache<String, List<List<String>>> uaCache = null;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    // 配置信息
+    private MysqlUtil mysqlUtil = null;
 
     public UDFRestNameFormat() {
     }
@@ -75,6 +77,7 @@ public class UDFRestNameFormat extends GenericUDF {
                 //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
                 .expireAfterAccess(10, TimeUnit.MINUTES)
                 .build(uaLoader);
+        mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
         return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
@@ -106,8 +109,6 @@ public class UDFRestNameFormat extends GenericUDF {
      */
     public List<List<String>> queryRestDeviceList(String deviceNo) throws UDFArgumentException {
         try {
-            // 配置信息
-            MysqlUtil mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
             List<List<String>> list = mysqlUtil.getLists(REST_QUERY_SQL + "where device_no='" + deviceNo + "'");
             return list;
         } catch (Exception e) {
@@ -128,16 +129,6 @@ public class UDFRestNameFormat extends GenericUDF {
         list.add("YPT13286");
         list.add("YPT13289");
         list.add("YPT13290");
-        list.add("YPT13291");
-        list.add("YPT13294");
-        list.add("YPT13296");
-        list.add("YPT13298");
-        list.add("YPT13299");
-        list.add("YPT13345");
-        list.add("YPT13482");
-        list.add("YPT13483");
-        list.add("YPT13496");
-        list.add("YPT13512");
         for (String dvo : list) {
             String restName;
             try (UDFRestNameFormat urlFormat = new UDFRestNameFormat()) {
