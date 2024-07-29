@@ -89,7 +89,7 @@ public class UDFRestNameFormat extends GenericUDF {
         String restName;
         try (UDFRestNameFormat urlFormat = new UDFRestNameFormat()) {
             DeferredObject[] deferredObjects = new DeferredObject[2];
-            // 平台类型、sc_url
+            // 设备编码、支付时间
             deferredObjects[0] = new DeferredJavaObject("YPT13291");
             deferredObjects[1] = new DeferredJavaObject("2024-07-16 12:34:23");
             ObjectInspector[] inspectorArr = new ObjectInspector[2];
