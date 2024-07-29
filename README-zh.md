@@ -33,7 +33,7 @@ mvn clean package
 如果你想跳过单元测试，可以这样运行：
 ```
 cd ${project_home}
-mvn clean package -DskipTests
+mvn clean package -DskipTests -Dmaven.javadoc.skip=true 
 ```
 
 命令执行完成后, 将会在target目录下生成hive-third-functions-${version}-shaded.jar文件.
