@@ -9,6 +9,8 @@ import org.apache.hadoop.io.Text;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,9 @@ import java.util.ArrayList;
         , extended = "Example:\n > select _FUNC_('2016-04-12', '2016-04-14') from src; \n" +
         " > select _FUNC_('2016-04-12 00:00:00', '2016-04-14 00:00:00', 86400000) from src;")
 public class UDFSequenceDate extends UDF {
+
+    private static final Logger logger = LoggerFactory.getLogger(UDFSequenceDate.class);
+
     public final static DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     public final static DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final long MAX_RESULT_ENTRIES = 10000;
@@ -65,7 +70,9 @@ public class UDFSequenceDate extends UDF {
     private static ArrayList<Text> fixedWidthSequence(long start, long stop, long step, DateTimeFormatter format) throws HiveException {
         checkValidStep(start, stop, step);
 
+
         int length = toIntExact((stop - start) / step + 1L);
+        logger.info("stop: {}, start: {}, step: {}", stop, start, step);
         checkMaxEntry(length);
 
         ArrayList<Text> result = Lists.newArrayList();
@@ -94,6 +101,6 @@ public class UDFSequenceDate extends UDF {
     public static void main(String[] args) throws HiveException {
         UDFSequenceDate sequence = new UDFSequenceDate();
 //        System.out.println(sequence.evaluate(new Text("2016-04-12 00:00:00"), new Text("2016-04-14 00:00:00"), 86400000));
-        System.out.println(sequence.evaluate(new Text("2016-04-12"), new Text("2016-04-14")));
+        System.out.println(sequence.evaluate(new Text("2019-04-20"), new Text("2021-04-19")));
     }
 }
