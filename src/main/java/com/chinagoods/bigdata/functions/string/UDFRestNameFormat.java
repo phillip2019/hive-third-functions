@@ -1,6 +1,9 @@
 package com.chinagoods.bigdata.functions.string;
 
 import com.chinagoods.bigdata.functions.utils.MysqlUtil;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -12,7 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zyl
@@ -25,15 +35,18 @@ import java.util.Map;
         , extended = "Example:\n> SELECT _FUNC_(device_no,pay_at) FROM src;")
 public class UDFRestNameFormat extends GenericUDF {
     private static final Logger logger = LoggerFactory.getLogger(UDFRestNameFormat.class);
-    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://172.18.5.10:23307/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     /**
      * 设备对应食堂有效期 fast_pass_device_valid_inf
      */
-    private static final String REST_QUERY_SQL = "select device_no,rest_name from fast_pass_device_valid_inf ";
+    private static final String REST_QUERY_SQL = "select device_no,rest_name,valid_start_at,valid_end_at from fast_pass_device_valid_inf ";
     private ObjectInspectorConverters.Converter[] converters;
     private static final int ARG_COUNT = 2;
+    private CacheLoader<String, List<List<String>>> uaLoader = null;
+    public LoadingCache<String, List<List<String>>> uaCache = null;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public UDFRestNameFormat() {
     }
@@ -49,6 +62,19 @@ public class UDFRestNameFormat extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
+        uaLoader = new CacheLoader<String, List<List<String>>>() {
+            @Override
+            public List<List<String>> load(String key) throws UDFArgumentException {
+                // 缓存miss时,加载数据的方法
+                logger.debug("进入加载数据, key： {}", key);
+                return queryRestDeviceList(key);
+            }
+        };
+        uaCache = CacheBuilder.newBuilder()
+                .maximumSize(10000)
+                //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build(uaLoader);
         return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
@@ -57,20 +83,33 @@ public class UDFRestNameFormat extends GenericUDF {
         assert (arguments.length == ARG_COUNT);
         String deviceNo = converters[0].convert(arguments[0].get()).toString();
         String payAt = converters[0].convert(arguments[1].get()).toString();
-        return queryRestName(deviceNo,payAt);
+        LocalDateTime paramAt = LocalDateTime.parse(payAt, formatter);
+        List<List<String>> dataList = null;
+        try {
+            dataList = uaCache.get(deviceNo);
+        } catch (ExecutionException e) {
+            logger.error("缓存获取失败，原始DVT为: {}", dataList, e);
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        for (List<String> subList : dataList) {
+            LocalDateTime start = LocalDateTime.parse(subList.get(2), formatter);
+            LocalDateTime end = LocalDateTime.parse(subList.get(3), formatter);
+            if (subList.get(0).equals(deviceNo) && paramAt.isAfter(start) && paramAt.isBefore(end)) {
+                return subList.get(1);
+            }
+        }
+        return null;
     }
 
     /**
-     *
-     *
      * @throws UDFArgumentException 查询mysql异常
      */
-    public String queryRestName(String deviceNo,String payAt) throws UDFArgumentException {
+    public List<List<String>> queryRestDeviceList(String deviceNo) throws UDFArgumentException {
         try {
             // 配置信息
             MysqlUtil mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
-            Map<String, String> paramKvMap = mysqlUtil.getMap(REST_QUERY_SQL + " where device_no='" + deviceNo + "' and valid_start_at<='" + payAt + "' and valid_end_at>='" + payAt + "'");
-            return paramKvMap.get(deviceNo);
+            List<List<String>> list = mysqlUtil.getLists(REST_QUERY_SQL + "where device_no='" + deviceNo + "'");
+            return list;
         } catch (Exception e) {
             logger.error("Failed to query the rest name. Procedure, the error details are: ", e);
             throw new UDFArgumentException(String.format("Failed to query the rest name. Procedure, the error details are: %s", e));
@@ -84,20 +123,37 @@ public class UDFRestNameFormat extends GenericUDF {
     }
 
     public static void main(String[] args) throws HiveException {
-        String restName;
-        try (UDFRestNameFormat urlFormat = new UDFRestNameFormat()) {
-            DeferredObject[] deferredObjects = new DeferredObject[2];
-            // 设备编码、支付时间
-            deferredObjects[0] = new DeferredJavaObject("YPT13291");
-            deferredObjects[1] = new DeferredJavaObject("2024-07-16 12:34:23");
-            ObjectInspector[] inspectorArr = new ObjectInspector[2];
-            inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-            inspectorArr[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
-            urlFormat.initialize(inspectorArr);
-            restName = urlFormat.evaluate(deferredObjects);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<String> list = new ArrayList<>();
+        list.add("YPT13285");
+        list.add("YPT13286");
+        list.add("YPT13289");
+        list.add("YPT13290");
+        list.add("YPT13291");
+        list.add("YPT13294");
+        list.add("YPT13296");
+        list.add("YPT13298");
+        list.add("YPT13299");
+        list.add("YPT13345");
+        list.add("YPT13482");
+        list.add("YPT13483");
+        list.add("YPT13496");
+        list.add("YPT13512");
+        for (String dvo : list) {
+            String restName;
+            try (UDFRestNameFormat urlFormat = new UDFRestNameFormat()) {
+                DeferredObject[] deferredObjects = new DeferredObject[2];
+                // 设备编码、支付时间
+                deferredObjects[0] = new DeferredJavaObject(dvo);
+                deferredObjects[1] = new DeferredJavaObject("2024-07-16 12:34:23");
+                ObjectInspector[] inspectorArr = new ObjectInspector[2];
+                inspectorArr[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+                inspectorArr[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+                urlFormat.initialize(inspectorArr);
+                restName = urlFormat.evaluate(deferredObjects);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(restName);
         }
-        System.out.println(restName);
     }
 }
