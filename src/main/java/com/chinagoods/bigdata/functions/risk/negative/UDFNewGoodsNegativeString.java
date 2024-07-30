@@ -1,8 +1,5 @@
 package com.chinagoods.bigdata.functions.risk.negative;
 
-import com.chinagoods.bigdata.functions.parse.UDFParseAuthorization;
-import com.chinagoods.bigdata.functions.utils.MysqlUtil;
-import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -15,8 +12,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author xiaowei.song
