@@ -378,10 +378,6 @@
                                     <pattern>com.fasterxml.jackson</pattern>
                                     <shadedPattern>com.chinagoods.shaded.com.fasterxml.jackson</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>com.mysql.cj</pattern>
-                                    <shadedPattern>com.chinagoods.shaded.com.mysql.cj</shadedPattern>
-                                </relocation>
                             </relocations>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <filters>
