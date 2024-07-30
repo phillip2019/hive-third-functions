@@ -39,13 +39,12 @@ public class UDFRestNameFormat extends GenericUDF {
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     /**
-     * 设备对应食堂有效期 fast_pass_device_valid_inf
+     * 设备对应食堂有效期 kjt_device_valid_inf
      */
-    private static final String REST_QUERY_SQL = "select device_no,rest_name,valid_start_at,valid_end_at from fast_pass_device_valid_inf ";
+    private static final String REST_QUERY_SQL = "select device_no,rest_name,valid_start_at,valid_end_at from kjt_device_valid_inf ";
     private ObjectInspectorConverters.Converter[] converters;
     private static final int ARG_COUNT = 2;
-//    private CacheLoader<String, List<List<String>>> dvLoader = null;
-//    public LoadingCache<String, List<List<String>>> dvCache = null;
+    List<List<String>> deviceList = new ArrayList<List<String>>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public UDFRestNameFormat() {
@@ -62,19 +61,7 @@ public class UDFRestNameFormat extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-//        dvLoader = new CacheLoader<String, List<List<String>>>() {
-//            @Override
-//            public List<List<String>> load(String key) throws UDFArgumentException {
-//                // 缓存miss时,加载数据的方法
-//                logger.debug("进入加载数据, key： {}", key);
-//                return queryRestDeviceList(key);
-//            }
-//        };
-//        dvCache = CacheBuilder.newBuilder()
-//                .maximumSize(10000)
-//                //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
-//                .expireAfterAccess(5, TimeUnit.MINUTES)
-//                .build(dvLoader);
+        queryRestDeviceList();
         return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
@@ -84,15 +71,7 @@ public class UDFRestNameFormat extends GenericUDF {
         String deviceNo = converters[0].convert(arguments[0].get()).toString();
         String payAt = converters[0].convert(arguments[1].get()).toString();
         LocalDateTime paramAt = LocalDateTime.parse(payAt, formatter);
-        List<List<String>> dataList = queryRestDeviceList(deviceNo);
-//        List<List<String>> dataList = null;
-//        try {
-//            dataList = dvCache.get(deviceNo);
-//        } catch (ExecutionException e) {
-//            logger.error("缓存获取失败，原始DVT为: {}", dataList, e);
-//        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        for (List<String> subList : dataList) {
+        for (List<String> subList : deviceList) {
             LocalDateTime start = LocalDateTime.parse(subList.get(2), formatter);
             LocalDateTime end = LocalDateTime.parse(subList.get(3), formatter);
             if (subList.get(0).equals(deviceNo) && paramAt.isAfter(start) && paramAt.isBefore(end)) {
@@ -105,11 +84,10 @@ public class UDFRestNameFormat extends GenericUDF {
     /**
      * @throws UDFArgumentException 查询mysql异常
      */
-    public List<List<String>> queryRestDeviceList(String deviceNo) throws UDFArgumentException {
+    public void queryRestDeviceList() throws UDFArgumentException {
         try {
             MysqlUtil mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
-            List<List<String>> list = mysqlUtil.getLists(REST_QUERY_SQL + "where device_no='" + deviceNo + "'");
-            return list;
+            deviceList = mysqlUtil.getLists(REST_QUERY_SQL);
         } catch (Exception e) {
             logger.error("Failed to query the rest name. Procedure, the error details are: ", e);
             throw new UDFArgumentException(String.format("Failed to query the rest name. Procedure, the error details are: %s", e));
