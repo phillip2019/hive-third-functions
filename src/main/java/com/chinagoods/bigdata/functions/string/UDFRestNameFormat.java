@@ -13,12 +13,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
         , extended = "Example:\n> SELECT _FUNC_(device_no,pay_at) FROM src;")
 public class UDFRestNameFormat extends GenericUDF {
     private static final Logger logger = LoggerFactory.getLogger(UDFRestNameFormat.class);
-    private static final String DB_URL = "jdbc:mysql://172.18.5.10:23307/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     /**
@@ -44,11 +44,9 @@ public class UDFRestNameFormat extends GenericUDF {
     private static final String REST_QUERY_SQL = "select device_no,rest_name,valid_start_at,valid_end_at from fast_pass_device_valid_inf ";
     private ObjectInspectorConverters.Converter[] converters;
     private static final int ARG_COUNT = 2;
-    private CacheLoader<String, List<List<String>>> uaLoader = null;
-    public LoadingCache<String, List<List<String>>> uaCache = null;
+//    private CacheLoader<String, List<List<String>>> dvLoader = null;
+//    public LoadingCache<String, List<List<String>>> dvCache = null;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    // 配置信息
-    private MysqlUtil mysqlUtil = null;
 
     public UDFRestNameFormat() {
     }
@@ -64,20 +62,19 @@ public class UDFRestNameFormat extends GenericUDF {
             converters[i] = ObjectInspectorConverters.getConverter(arguments[i],
                     PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-        uaLoader = new CacheLoader<String, List<List<String>>>() {
-            @Override
-            public List<List<String>> load(String key) throws UDFArgumentException {
-                // 缓存miss时,加载数据的方法
-                logger.debug("进入加载数据, key： {}", key);
-                return queryRestDeviceList(key);
-            }
-        };
-        uaCache = CacheBuilder.newBuilder()
-                .maximumSize(10000)
-                //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build(uaLoader);
-        mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
+//        dvLoader = new CacheLoader<String, List<List<String>>>() {
+//            @Override
+//            public List<List<String>> load(String key) throws UDFArgumentException {
+//                // 缓存miss时,加载数据的方法
+//                logger.debug("进入加载数据, key： {}", key);
+//                return queryRestDeviceList(key);
+//            }
+//        };
+//        dvCache = CacheBuilder.newBuilder()
+//                .maximumSize(10000)
+//                //缓存项在给定时间内没有被写访问（创建或覆盖），则回收。如果认为缓存数据总是在固定时候后变得陈旧不可用，这种回收方式是可取的。
+//                .expireAfterAccess(5, TimeUnit.MINUTES)
+//                .build(dvLoader);
         return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
@@ -87,12 +84,13 @@ public class UDFRestNameFormat extends GenericUDF {
         String deviceNo = converters[0].convert(arguments[0].get()).toString();
         String payAt = converters[0].convert(arguments[1].get()).toString();
         LocalDateTime paramAt = LocalDateTime.parse(payAt, formatter);
-        List<List<String>> dataList = null;
-        try {
-            dataList = uaCache.get(deviceNo);
-        } catch (ExecutionException e) {
-            logger.error("缓存获取失败，原始DVT为: {}", dataList, e);
-        }
+        List<List<String>> dataList = queryRestDeviceList(deviceNo);
+//        List<List<String>> dataList = null;
+//        try {
+//            dataList = dvCache.get(deviceNo);
+//        } catch (ExecutionException e) {
+//            logger.error("缓存获取失败，原始DVT为: {}", dataList, e);
+//        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for (List<String> subList : dataList) {
             LocalDateTime start = LocalDateTime.parse(subList.get(2), formatter);
@@ -109,6 +107,7 @@ public class UDFRestNameFormat extends GenericUDF {
      */
     public List<List<String>> queryRestDeviceList(String deviceNo) throws UDFArgumentException {
         try {
+            MysqlUtil mysqlUtil = new MysqlUtil(DB_URL, DB_USER, DB_PASSWORD);
             List<List<String>> list = mysqlUtil.getLists(REST_QUERY_SQL + "where device_no='" + deviceNo + "'");
             return list;
         } catch (Exception e) {
@@ -129,9 +128,10 @@ public class UDFRestNameFormat extends GenericUDF {
         list.add("YPT13286");
         list.add("YPT13289");
         list.add("YPT13290");
+        UDFRestNameFormat urlFormat = new UDFRestNameFormat();
         for (String dvo : list) {
             String restName;
-            try (UDFRestNameFormat urlFormat = new UDFRestNameFormat()) {
+            try {
                 DeferredObject[] deferredObjects = new DeferredObject[2];
                 // 设备编码、支付时间
                 deferredObjects[0] = new DeferredJavaObject(dvo);
@@ -141,7 +141,7 @@ public class UDFRestNameFormat extends GenericUDF {
                 inspectorArr[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
                 urlFormat.initialize(inspectorArr);
                 restName = urlFormat.evaluate(deferredObjects);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             System.out.println(restName);
