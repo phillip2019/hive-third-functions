@@ -1,5 +1,6 @@
 package com.chinagoods.bigdata.functions.json;
 
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -13,18 +14,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.BinaryObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.BooleanObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.ByteObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.DoubleObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.FloatObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.IntObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.ShortObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.TimestampObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantBooleanObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.*;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -33,6 +23,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -119,8 +110,8 @@ public class UDFToJson extends GenericUDF {
         public StructInspectorHandle(StructObjectInspector insp) throws UDFArgumentException {
             structInspector = insp;
             List<? extends StructField> fieldList = insp.getAllStructFieldRefs();
-            this.fieldNames = new ArrayList<String>();
-            this.fieldInspectorHandles = new ArrayList<InspectorHandle>();
+            this.fieldNames = new ArrayList<>();
+            this.fieldInspectorHandles = new ArrayList<>();
             for (StructField sf : fieldList) {
                 fieldNames.add(sf.getFieldName());
                 fieldInspectorHandles.add(GenerateInspectorHandle(sf.getFieldObjectInspector()));
@@ -168,7 +159,7 @@ public class UDFToJson extends GenericUDF {
                 gen.writeNull();
             } else {
                 gen.writeStartArray();
-                List list = arrayInspector.getList(obj);
+                List<?> list = arrayInspector.getList(obj);
                 for (Object listObj : list) {
                     valueInspector.generateJson(gen, listObj);
                 }
@@ -178,7 +169,7 @@ public class UDFToJson extends GenericUDF {
 
     }
 
-    private class StringInspectorHandle implements InspectorHandle {
+    private static class StringInspectorHandle implements InspectorHandle {
         private StringObjectInspector strInspector;
 
 
@@ -216,7 +207,26 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class DoubleInspectorHandle implements InspectorHandle {
+    private static class DecimalInspectorHandle implements InspectorHandle {
+
+        private HiveDecimalObjectInspector decimalInspector;
+
+        public DecimalInspectorHandle(HiveDecimalObjectInspector insp) {
+            decimalInspector = insp;
+        }
+
+        @Override
+        public void generateJson(JsonGenerator gen, Object obj) throws JsonGenerationException, IOException {
+            if (obj == null) {
+                gen.writeNull();
+            } else {
+                HiveDecimal num = decimalInspector.getPrimitiveJavaObject(obj);
+                gen.writeNumber(num.bigDecimalValue());
+            }
+        }
+    }
+
+    private static class DoubleInspectorHandle implements InspectorHandle {
         private DoubleObjectInspector dblInspector;
 
         public DoubleInspectorHandle(DoubleObjectInspector insp) {
@@ -234,7 +244,7 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class LongInspectorHandle implements InspectorHandle {
+    private static class LongInspectorHandle implements InspectorHandle {
         private LongObjectInspector longInspector;
 
         public LongInspectorHandle(LongObjectInspector insp) {
@@ -252,7 +262,7 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class ShortInspectorHandle implements InspectorHandle {
+    private static class ShortInspectorHandle implements InspectorHandle {
         private ShortObjectInspector shortInspector;
 
         public ShortInspectorHandle(ShortObjectInspector insp) {
@@ -271,7 +281,7 @@ public class UDFToJson extends GenericUDF {
     }
 
 
-    private class ByteInspectorHandle implements InspectorHandle {
+    private static class ByteInspectorHandle implements InspectorHandle {
         private ByteObjectInspector byteInspector;
 
         public ByteInspectorHandle(ByteObjectInspector insp) {
@@ -290,7 +300,7 @@ public class UDFToJson extends GenericUDF {
     }
 
 
-    private class FloatInspectorHandle implements InspectorHandle {
+    private static class FloatInspectorHandle implements InspectorHandle {
         private FloatObjectInspector floatInspector;
 
         public FloatInspectorHandle(FloatObjectInspector insp) {
@@ -308,7 +318,7 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class BooleanInspectorHandle implements InspectorHandle {
+    private static class BooleanInspectorHandle implements InspectorHandle {
         private BooleanObjectInspector boolInspector;
 
         public BooleanInspectorHandle(BooleanObjectInspector insp) {
@@ -326,7 +336,7 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class BinaryInspectorHandle implements InspectorHandle {
+    private static class BinaryInspectorHandle implements InspectorHandle {
         private BinaryObjectInspector binaryInspector;
 
         public BinaryInspectorHandle(BinaryObjectInspector insp) {
@@ -344,7 +354,7 @@ public class UDFToJson extends GenericUDF {
         }
     }
 
-    private class TimestampInspectorHandle implements InspectorHandle {
+    private static class TimestampInspectorHandle implements InspectorHandle {
         private TimestampObjectInspector timestampInspector;
         private DateTimeFormatter isoFormatter = ISODateTimeFormat.dateTimeNoMillis();
 
@@ -396,9 +406,9 @@ public class UDFToJson extends GenericUDF {
                 return new BinaryInspectorHandle((BinaryObjectInspector) primInsp);
             } else if (primCat == PrimitiveCategory.TIMESTAMP) {
                 return new TimestampInspectorHandle((TimestampObjectInspector) primInsp);
+            } else if (primCat == PrimitiveCategory.DECIMAL) {
+                return new DecimalInspectorHandle((HiveDecimalObjectInspector) primInsp);
             }
-
-
         }
         /// Dunno ...
         throw new UDFArgumentException("Don't know how to handle object inspector " + insp);
