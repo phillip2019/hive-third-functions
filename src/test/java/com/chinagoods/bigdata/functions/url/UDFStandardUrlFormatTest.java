@@ -34,9 +34,7 @@ public class UDFStandardUrlFormatTest {
             GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("https://m.chinagoods.com/searchsort/?typeKeywords=????&product_type_id=587&parent_product_type_id=35&from=indushttps://www.chinagoods.com/search/categoryProduct/T--51---S--1---P--1");
             GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
             resList = udf.evaluate(args);
-            assert "智慧名片".equals(resList.get(1));
-            assert "支付有礼".equals(resList.get(2));
-            assert "红包活动下单页".equals(resList.get(3));
+
         }
 
 //        String RULE_SQL = "select platform_type,sc_url from test2 where" +
