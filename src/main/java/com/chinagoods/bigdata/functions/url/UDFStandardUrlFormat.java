@@ -43,7 +43,7 @@ import java.util.stream.Stream;
         , extended = "Example:\n> SELECT _FUNC_(platform_type,sc_url) FROM src;")
 public class UDFStandardUrlFormat extends GenericUDF {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
-    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://172.18.5.10:23307/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
     /**
@@ -313,10 +313,7 @@ public class UDFStandardUrlFormat extends GenericUDF {
                     String pageLinkName = ls.get(8);
                     //当URL包含多个key
                     int indexStart = scUrl.lastIndexOf(specialUrlPath) + specialUrlPath.length();
-                    int indexEnd = scUrl.lastIndexOf(BACKSLASH);
-                    if (indexEnd < 0) {
-                        indexEnd = scUrl.length();
-                    }
+                    int indexEnd = scUrl.length();
                     String menuUrlParam = scUrl.substring(indexStart, indexEnd).toLowerCase();
                     if (menuUrlParam.contains(SEPARATOR)) {
                         // 固定参数

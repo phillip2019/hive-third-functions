@@ -12,12 +12,16 @@ import java.util.*;
 
 public class UDFStandardUrlFormatTest {
     private static final Logger logger = LoggerFactory.getLogger(UDFStandardUrlFormat.class);
-    private static final String DB_URL = "jdbc:mysql://172.18.5.22:3306/source?characterEncoding=UTF-8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://172.18.5.10:23307/source?characterEncoding=UTF-8&useSSL=false";
     private static final String DB_USER = "source";
     private static final String DB_PASSWORD = "jP8*dKw,bRjBVos=";
 
     @Test
     public void testMiniProgramsUrl() throws Exception {
+//        String aa="https://m.chinagoods.com/searchsort/?typeKeywords=????&product_type_id=587&parent_product_type_id=35&from=indushttps://www.chinagoods.com/search/categoryProduct/T--51---S--1---P--1";
+//        System.out.println(aa.lastIndexOf("/"));
+//        String ss=aa.substring(161,180);
+//        System.out.print(ss);
         ArrayList<String> resList;
         try (UDFStandardUrlFormat udf = new UDFStandardUrlFormat()) {
             ObjectInspector platform_type = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
@@ -26,8 +30,8 @@ public class UDFStandardUrlFormatTest {
             udf.initialize(arguments);
 
             resList = null;
-            GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("mini_programs");
-            GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("pages/order/index?activityId=1733823737853022210&shopId=54681");
+            GenericUDF.DeferredObject sourceObj = new GenericUDF.DeferredJavaObject("wap");
+            GenericUDF.DeferredObject patternObj = new GenericUDF.DeferredJavaObject("https://m.chinagoods.com/searchsort/?typeKeywords=????&product_type_id=587&parent_product_type_id=35&from=indushttps://www.chinagoods.com/search/categoryProduct/T--51---S--1---P--1");
             GenericUDF.DeferredObject[] args = {sourceObj, patternObj};
             resList = udf.evaluate(args);
             assert "智慧名片".equals(resList.get(1));
