@@ -7,6 +7,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.serde2.objectinspector.*;
+import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
@@ -136,17 +137,34 @@ public class UDAFSortKeyByValue extends AbstractGenericUDAFResolver {
             if (partial != null) {
                 SortBuffer sortBuffer = (SortBuffer) agg;
                 
-                @SuppressWarnings("unchecked")
-                List<Object> partialResult = (List<Object>) partial;
-                
-                for (Object item : partialResult) {
-                    if (item instanceof List) {
-                        @SuppressWarnings("unchecked")
-                        List<Object> keyValueList = (List<Object>) item;
-                        if (keyValueList.size() >= 2) {
-                            String key = keyValueList.get(0).toString();
-                            String value = keyValueList.get(1).toString();
-                            sortBuffer.keyValuePairs.add(new KeyValuePair(key, value));
+                // 使用ObjectInspector来正确处理partial结果
+                if (internalMergeOI != null) {
+                    int listSize = internalMergeOI.getListLength(partial);
+                    ObjectInspector structOI = internalMergeOI.getListElementObjectInspector();
+                    
+                    if (structOI instanceof StructObjectInspector) {
+                        StructObjectInspector structInspector = (StructObjectInspector) structOI;
+                        List<? extends StructField> fields = structInspector.getAllStructFieldRefs();
+                        
+                        if (fields.size() >= 2) {
+                            StructField keyField = fields.get(0);
+                            StructField valueField = fields.get(1);
+                            ObjectInspector keyFieldOI = keyField.getFieldObjectInspector();
+                            ObjectInspector valueFieldOI = valueField.getFieldObjectInspector();
+                            
+                            for (int i = 0; i < listSize; i++) {
+                                Object listElement = internalMergeOI.getListElement(partial, i);
+                                if (listElement != null) {
+                                    Object keyObj = structInspector.getStructFieldData(listElement, keyField);
+                                    Object valueObj = structInspector.getStructFieldData(listElement, valueField);
+                                    
+                                    if (keyObj != null && valueObj != null) {
+                                        String key = ((PrimitiveObjectInspector) keyFieldOI).getPrimitiveJavaObject(keyObj).toString();
+                                        String value = ((PrimitiveObjectInspector) valueFieldOI).getPrimitiveJavaObject(valueObj).toString();
+                                        sortBuffer.keyValuePairs.add(new KeyValuePair(key, value));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
