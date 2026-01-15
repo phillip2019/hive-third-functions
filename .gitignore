@@ -33,3 +33,6 @@ Thumbs.db
 # *.tar
 # *.tar.gz
 .vscode/settings.json
+generate_udf_list.py
+register_udfs.py
+check_docs.py

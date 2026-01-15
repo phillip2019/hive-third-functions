@@ -1,0 +1,26 @@
+{
+  "APIKEY": "your-secret-key",
+  "PROXY_URL": "http://127.0.0.1:10809",
+  "LOG": true,
+  "API_TIMEOUT_MS": 600000,
+  "NON_INTERACTIVE_MODE": false,
+  "Providers": [
+    {
+      "name": "gemini",
+      "api_base_url": "https://generativelanguage.googleapis.com/v1beta/models/",
+      "api_key": "AIzaSyCzgqchHG082Zs68toDJbKMIl_jT9I7FXU",
+      "models": ["gemini-3-pro-preview"],
+      "transformer": {
+        "use": ["gemini"]
+      }
+    }
+  ],
+  "Router": {
+    "default": "gemini",
+    "background": "gemini",
+    "think": "gemini",
+    "longContext": "google/gemini-3-pro-preview",
+    "longContextThreshold": 60000,
+    "webSearch": "gemini,gemini-3-pro-preview"
+  }
+}

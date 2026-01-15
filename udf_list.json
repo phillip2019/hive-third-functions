@@ -1,0 +1,2111 @@
+[
+    {
+        "name": "ad_url_format",
+        "className": "com.chinagoods.bigdata.functions.url.UDFAdUrlFormat",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-27 time: 16:04",
+        "usage": "ad_url_format(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: String",
+        "example": "select ad_url_format(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array2_string",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArray2String",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2021-10-27 time: 15:10",
+        "usage": "array2_string(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select array2_string(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_around_cross",
+        "className": "com.chinagoods.bigdata.functions.array.UDTFArrayAroundCross",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2022-10-26 time: 09:39",
+        "usage": "array_around_cross(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回值详见源码",
+        "example": "select array_around_cross(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_cast",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayCast",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan 2016-07-26 18:03 Cast an Array of objects to an Array of a different type to avoid Hive UDF casting problems",
+        "usage": "array_cast(...)",
+        "paramDesc": "参数类型: List<Object>",
+        "returnDesc": "返回类型: List<Object>",
+        "example": "select array_cast(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_concat",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayConcat",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "连接两个数组.",
+        "usage": "array_concat(array, array) -> array",
+        "paramDesc": "参数: array, array",
+        "returnDesc": "返回: array",
+        "example": "select array_concat(array(16,12,18,9,null), array(14,9,6,18,null)) => [16,12,18,9,null,14,9,6,18,null]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_contains",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayContains",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断数组是否包含某个值.",
+        "usage": "array_contains(array<E>, E) -> boolean",
+        "paramDesc": "参数: array<E>, E",
+        "returnDesc": "返回: boolean",
+        "example": "select array_contains(array(16,12,18,9), 12) => true",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_distinct",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayDistinct",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "移除数组中的重复元素.",
+        "usage": "array_distinct(array) -> array",
+        "paramDesc": "参数: array",
+        "returnDesc": "返回: array",
+        "example": "select array_distinct(array(16,13,12,13,18,16,9,18)) => [9,12,13,16,18]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_element_at",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayElementAt",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回指定位置的数组元素. 如果索引位置 < 0, 则从尾部开始计数并返回.",
+        "usage": "array_element_at(array<E>, index) -> E",
+        "paramDesc": "参数: array<E>, index",
+        "returnDesc": "返回: E",
+        "example": "select array_element_at(array(16,13,12,13,18,16,9,18), -1) => 18",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_equals",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayEquals",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断两个数组是否相等.",
+        "usage": "array_equals(array<E>, array<E>) -> boolean",
+        "paramDesc": "参数: array<E>, array<E>",
+        "returnDesc": "返回: boolean",
+        "example": "select array_equals(array(16,12,18,9), array(16,12,18,9)) => true",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_intersect",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayIntersect",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回两个数组的交集.",
+        "usage": "array_intersect(array, array) -> array",
+        "paramDesc": "参数: array, array",
+        "returnDesc": "返回: array",
+        "example": "select array_intersect(array(16,12,18,9,null), array(14,9,6,18,null)) => [null,9,18]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_join",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayJoin",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "使用给定的连接符来连接数组中的元素, `null_replacement`是一个可选项, 用来替代空值.",
+        "usage": "array_join(array, delimiter, null_replacement) -> string",
+        "paramDesc": "参数: array, delimiter, null_replacement",
+        "returnDesc": "返回: string",
+        "example": "select array_join(array(16,12,18,9,null), '#','=') => 16#12#18#9#=",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_max",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayMax",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回数组中的最大值.",
+        "usage": "array_max(array<E>) -> E",
+        "paramDesc": "参数: array<E>",
+        "returnDesc": "返回: E",
+        "example": "select array_max(array(16,13,12,13,18,16,9,18)) => 18",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_min",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayMin",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回数组中的最小值.",
+        "usage": "array_min(array<E>) -> E",
+        "paramDesc": "参数: array<E>",
+        "returnDesc": "返回: E",
+        "example": "select array_min(array(16,12,18,9)) => 9",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_position",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayPosition",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回给定元素在数组中第一次出现的位置 (如果没找到, 返回0).",
+        "usage": "array_position(array<E>, E) -> long",
+        "paramDesc": "参数: array<E>, E",
+        "returnDesc": "返回: long",
+        "example": "select array_position(array(16,13,12,13,18,16,9,18), 13) => 2",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_remove",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayRemove",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "删除数组中的给定元素.",
+        "usage": "array_remove(array<E>, E) -> array",
+        "paramDesc": "参数: array<E>, E",
+        "returnDesc": "返回: array",
+        "example": "select array_remove(array(16,13,12,13,18,16,9,18), 13) => [16,12,18,16,9,18]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_reverse",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayReverse",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "反转一个数组.",
+        "usage": "array_reverse(array) -> array",
+        "paramDesc": "参数: array",
+        "returnDesc": "返回: array",
+        "example": "select array_reverse(array(16,12,18,9)) => [9,18,12,16]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_shuffle",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayShuffle",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "对数组shuffle.",
+        "usage": "array_shuffle(array) -> array",
+        "paramDesc": "参数: array",
+        "returnDesc": "返回: array",
+        "example": "select array_shuffle(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_slice",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArraySlice",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "对数组进行分片操作，start为正数从前开始分片, start为负数从后开始分片, 长度为指定的长度.",
+        "usage": "array_slice(array, start, length) -> array",
+        "paramDesc": "参数: array, start, length",
+        "returnDesc": "返回: array",
+        "example": "select array_slice(array(16,13,12,13,18,16,9,18), -2, 3) => [9,18]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_sort",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArraySort",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "对数组排序, 数组中的元素必需是可排序的.",
+        "usage": "array_sort(array) -> array",
+        "paramDesc": "参数: array",
+        "returnDesc": "返回: array",
+        "example": "select array_sort(array(16,13,12,13,18,16,9,18)) => [9,12,13,13,16,16,18,18]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_sum",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArraySum",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-26 time: 17:32",
+        "usage": "array_sum(...)",
+        "paramDesc": "参数类型: List<Object>",
+        "returnDesc": "返回类型: Double",
+        "example": "select array_sum(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "array_value_count",
+        "className": "com.chinagoods.bigdata.functions.array.UDFArrayValueCount",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "统计数组中包含给定元素的个数.",
+        "usage": "array_value_count(array<E>, E) -> long",
+        "paramDesc": "参数: array<E>, E",
+        "returnDesc": "返回: long",
+        "example": "select array_value_count(array(16,13,12,13,18,16,9,18), 13) => 2",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "bit_count",
+        "className": "com.chinagoods.bigdata.functions.bitwise.UDFBitCount",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "count the number of bits set in `x` (treated as bits-bit signed integer) in 2’s complement representation",
+        "usage": "bit_count(x, bits) -> bigint",
+        "paramDesc": "参数: x, bits",
+        "returnDesc": "返回: bigint",
+        "example": "select bit_count(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "bitwise_and",
+        "className": "com.chinagoods.bigdata.functions.bitwise.UDFBitwiseAnd",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the bitwise AND of `x` and `y` in 2’s complement arithmetic.",
+        "usage": "bitwise_and(x, y) -> bigint",
+        "paramDesc": "参数: x, y",
+        "returnDesc": "返回: bigint",
+        "example": "select bitwise_and(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "bitwise_not",
+        "className": "com.chinagoods.bigdata.functions.bitwise.UDFBitwiseNot",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the bitwise NOT of `x` in 2’s complement arithmetic.",
+        "usage": "bitwise_not(x) -> bigint",
+        "paramDesc": "参数: x",
+        "returnDesc": "返回: bigint",
+        "example": "select bitwise_not(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "bitwise_or",
+        "className": "com.chinagoods.bigdata.functions.bitwise.UDFBitwiseOr",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the bitwise OR of `x` and `y` in 2’s complement arithmetic.",
+        "usage": "bitwise_or(x, y) -> bigint",
+        "paramDesc": "参数: x, y",
+        "returnDesc": "返回: bigint",
+        "example": "select bitwise_or(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "bitwise_xor",
+        "className": "com.chinagoods.bigdata.functions.bitwise.UDFBitwiseXor",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the bitwise XOR of `x` and `y` in 2’s complement arithmetic.",
+        "usage": "bitwise_xor(x, y) -> bigint",
+        "paramDesc": "参数: x, y",
+        "returnDesc": "返回: bigint",
+        "example": "select bitwise_xor(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card15to18",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCard15to18",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-25 time: 20:15",
+        "usage": "china_id_card15to18(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select china_id_card15to18(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_age",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardAge",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-25 time: 20:14",
+        "usage": "china_id_card_age(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select china_id_card_age(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_area",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardArea",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "从身份证号获取区/县",
+        "usage": "id_card_area(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select china_id_card_area(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_birthday",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardBirthday",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "从身份证号获取生日",
+        "usage": "id_card_birthday(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select china_id_card_birthday(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_city",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardCity",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "从身份证号获取城市",
+        "usage": "id_card_city(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select china_id_card_city(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_gender",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardGender",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "从身份证号获取性别",
+        "usage": "id_card_gender(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select china_id_card_gender(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_info",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardInfo",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "获取身份证号信息. 包活省份、城市、区县等.",
+        "usage": "id_card_info(string) -> json",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: json",
+        "example": "select id_card_info('110101198901084517') => {\"valid\":true,\"area\":\"东城区\",\"province\":\"北京市\",\"gender\":\"男\",\"city\":\"北京市\"}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_province",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardProvince",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "从身份证号获取省份",
+        "usage": "id_card_province(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select china_id_card_province(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "china_id_card_valid",
+        "className": "com.chinagoods.bigdata.functions.card.UDFChinaIdCardValid",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "鉴定身份证号是否有效.",
+        "usage": "is_valid_id_card(string) -> boolean",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: boolean",
+        "example": "select china_id_card_valid(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "chinese_to_pin_yin",
+        "className": "com.chinagoods.bigdata.functions.string.UDFChineseToPinYin",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "将汉字转换为拼音",
+        "usage": "pinyin(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select pinyin('中国') => zhongguo",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "code_point",
+        "className": "com.chinagoods.bigdata.functions.string.UDFCodePoint",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-26 time: 23:23",
+        "usage": "code_point(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: LongWritable",
+        "example": "select code_point(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "date_format",
+        "className": "com.chinagoods.bigdata.functions.date.UDFDateFormat",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author songxiaowei date: 2023-08-13",
+        "usage": "date_format(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select date_format(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "day_of_week",
+        "className": "com.chinagoods.bigdata.functions.date.UDFDayOfWeek",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "一周的第几天,周一返回 1, 周日返回 7, 出错返回null.",
+        "usage": "day_of_week(date_string \\| date) -> int",
+        "paramDesc": "参数: date_string \\| date",
+        "returnDesc": "返回: int",
+        "example": "select day_of_week('2016-07-12') => 2",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "day_of_year",
+        "className": "com.chinagoods.bigdata.functions.date.UDFDayOfYear",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "一年的第几天. 值的范围从 1 到 366.",
+        "usage": "day_of_year(date_string \\| date) -> int",
+        "paramDesc": "参数: date_string \\| date",
+        "returnDesc": "返回: int",
+        "example": "select day_of_year('2016-01-01') => 1",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "full2_half",
+        "className": "com.chinagoods.bigdata.functions.string.UDFFull2Half",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song @version v1.0.0 @description TODO @date 2021/5/7 16:04",
+        "usage": "full2_half(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: String",
+        "example": "select full2_half(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_bd_to_gcj",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoBdToGcj",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "BD-09(百度坐标系) 转为 GCJ-02(火星坐标系), 百度——>谷歌、高德",
+        "usage": "bd_to_gcj(double,double) -> json",
+        "paramDesc": "参数: double,double",
+        "returnDesc": "返回: json",
+        "example": "select bd_to_gcj(39.915, 116.404) => {\"lng\":116.39762729119315,\"lat\":39.90865673957631}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_gcj_extract_wgs",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoGcjExtractWgs",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "GCJ02(火星坐标系) 转为 GPS84, 输出的坐标精度在0.5米. 但是计算比`gcj_to_wgs`耗时长.",
+        "usage": "gcj_extract_wgs(double,double) -> json",
+        "paramDesc": "参数: double,double",
+        "returnDesc": "返回: json",
+        "example": "select gcj_extract_wgs(39.915, 116.404) => {\"lng\":116.39775549316407,\"lat\":39.913596801757805}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_gcj_to_bd",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoGcjToBd",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "GCJ-02(火星坐标系) 转为 BD-09(百度坐标系), 谷歌、高德——>百度",
+        "usage": "gcj_to_bd(double,double) -> json",
+        "paramDesc": "参数: double,double",
+        "returnDesc": "返回: json",
+        "example": "select gcj_to_bd(39.915, 116.404) => {\"lng\":116.41036949371029,\"lat\":39.92133699351022}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_gcj_to_wgs",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoGcjToWgs",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "GCJ02(火星坐标系) 转为 GPS84(地球坐标系), 输出的坐标精度在1到2米.",
+        "usage": "gcj_to_wgs(double,double) -> json",
+        "paramDesc": "参数: double,double",
+        "returnDesc": "返回: json",
+        "example": "select gcj_to_wgs(39.915, 116.404) => {\"lng\":116.39775550083061,\"lat\":39.91359571849836}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_wgs_distance",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoWgsDistance",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "计算 WGS84坐标距离, 单位米.",
+        "usage": "wgs_distance(double lat1, double lng1, double lat2, double lng2) -> double",
+        "paramDesc": "参数: double lat1, double lng1, double lat2, double lng2",
+        "returnDesc": "返回: double",
+        "example": "select geo_wgs_distance(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "geo_wgs_to_gcj",
+        "className": "com.chinagoods.bigdata.functions.geo.UDFGeoWgsToGcj",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "WGS84(地球坐标系) 转为 GCJ02(火星坐标系)",
+        "usage": "wgs_to_gcj(double,double) -> json",
+        "paramDesc": "参数: double,double",
+        "returnDesc": "返回: json",
+        "example": "select wgs_to_gcj(39.915, 116.404) => {\"lng\":116.41024449916938,\"lat\":39.91640428150164}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "img_ocr",
+        "className": "com.chinagoods.bigdata.functions.img.UDFImgOcr",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "Created by xiaowei.song on 17/3/23.",
+        "usage": "img_ocr(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select img_ocr(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "img_p_hash",
+        "className": "com.chinagoods.bigdata.functions.img.UDFImgPHash",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "Created by xiaowei.song on 17/3/23.",
+        "usage": "img_p_hash(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select img_p_hash(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "ip2_region",
+        "className": "com.chinagoods.bigdata.functions.ip.UDFIP2Region",
+        "kind": "IP_AND_DOMAIN",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2020-12-7 time: 17:02",
+        "usage": "ip2_region(...)",
+        "paramDesc": "参数类型: String, int",
+        "returnDesc": "返回类型: Text",
+        "example": "select ip2_region(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArray",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-25 time: 16:26",
+        "usage": "json_array(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: ArrayList<String>",
+        "example": "select json_array(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array_extract",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArrayExtract",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "extract json array by given jsonPath.",
+        "usage": "json_array_extract(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_array_extract(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array_extract_scalar",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArrayExtractScalar",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "like `json_array_extract`, but returns the result value as a string (as opposed to being encoded as JSON).",
+        "usage": "json_array_extract_scalar(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_array_extract_scalar(\"[{\\\"a\\\":{\\\"b\\\":\\\"13\\\"}}, {\\\"a\\\":{\\\"b\\\":\\\"18\\\"}}, {\\\"a\\\":{\\\"b\\\":\\\"12\\\"}}]\", \"$.a.b\") => [\"13\",\"18\",\"12\"]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array_get",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArrayGet",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the element at the specified index into the `json_array`. The index is zero-based.",
+        "usage": "json_array_get(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_array_get(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array_group",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArrayGroup",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2016-07-25 time: 16:26",
+        "usage": "json_array_group(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: ArrayList<String>",
+        "example": "select json_array_group(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_array_length",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonArrayLength",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "returns the array length of `json` (a string containing a JSON array).",
+        "usage": "json_array_length(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_array_length(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_extract",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonExtract",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "extract json by given jsonPath.",
+        "usage": "json_extract(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_extract(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_extract_scalar",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonExtractScalar",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "like `json_extract`, but returns the result value as a string (as opposed to being encoded as JSON).",
+        "usage": "json_extract_scalar(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_extract_scalar(\"{\\\"a\\\":{\\\"b\\\":\\\"12\\\"}}\", \"$.a.b\") => 12",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "json_size",
+        "className": "com.chinagoods.bigdata.functions.json.UDFJsonSize",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "like `json_extract`, but returns the size of the value. For objects or arrays, the size is the number of members, and the size of a scalar value is zero.",
+        "usage": "json_size(json, jsonPath) -> array(varchar)",
+        "paramDesc": "参数: json, jsonPath",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select json_size(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "logistic_no_valid",
+        "className": "com.chinagoods.bigdata.functions.logistic.UDFLogisticNoValid",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2022-11-24 time: 14:56",
+        "usage": "logistic_no_valid(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: BooleanWritable",
+        "example": "select logistic_no_valid(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "map2_sort_key_array",
+        "className": "com.chinagoods.bigdata.functions.map.UDFMap2SortKeyArray",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2016-07-27 time: 15:39",
+        "usage": "map2_sort_key_array(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select map2_sort_key_array(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "map_build",
+        "className": "com.chinagoods.bigdata.functions.map.UDFMapBuild",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "根据指定的键/值对数组创建map.",
+        "usage": "map_build(x<K>, y<V>) -> map<K, V>",
+        "paramDesc": "参数: x<K>, y<V>",
+        "returnDesc": "返回: map<K, V>",
+        "example": "select map_build(array('key1','key2'), array(16,12)) => {\"key1\":16,\"key2\":12}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "map_concat",
+        "className": "com.chinagoods.bigdata.functions.map.UDFMapConcat",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回两个map的并集. 如果一个键在 `x` 和 `y`中同时出现, 那对应值来自`y`.",
+        "usage": "map_concat(x<K, V>, y<K, V>) -> map<K,V>",
+        "paramDesc": "参数: x<K, V>, y<K, V>",
+        "returnDesc": "返回: map<K,V>",
+        "example": "select map_concat(map_build(array('key1','key2'), array(16,12)), map_build(array('key1','key3'), array(17,18))) => {\"key1\":17,\"key2\":12,\"key3\":18}",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "map_element_at",
+        "className": "com.chinagoods.bigdata.functions.map.UDFMapElementAt",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "如果指定的`key`存在，返回对应的值, 否则返回 `NULL` .",
+        "usage": "map_element_at(map<K, V>, key) -> V",
+        "paramDesc": "参数: map<K, V>, key",
+        "returnDesc": "返回: V",
+        "example": "select map_element_at(map_build(array('key1','key2'), array(16,12)), 'key1') => 16",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "map_equals",
+        "className": "com.chinagoods.bigdata.functions.map.UDFMapEquals",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断map x 和 map y是否相等.",
+        "usage": "map_equals(x<K, V>, y<K, V>) -> boolean",
+        "paramDesc": "参数: x<K, V>, y<K, V>",
+        "returnDesc": "返回: boolean",
+        "example": "select map_equals(map_build(array('key1','key2'), array(16,12)), map_build(array('key1','key2'), array(16,12))) => true",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_cosine_similarity",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathCosineSimilarity",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回两个稀疏向量的余弦相似度",
+        "usage": "cosine_similarity(x, y) -> double",
+        "paramDesc": "参数: x, y",
+        "returnDesc": "返回: double",
+        "example": "select math_cosine_similarity(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_from_base",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathFromBase",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "获取字面量的值，该值的基数为radix",
+        "usage": "from_base(string, radix) -> bigint",
+        "paramDesc": "参数: string, radix",
+        "returnDesc": "返回: bigint",
+        "example": "select math_from_base(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_infinity",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathInfinity",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "获取正无穷常数",
+        "usage": "infinity() -> double",
+        "paramDesc": "无参数",
+        "returnDesc": "返回: double",
+        "example": "select math_infinity(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_inverse_normal_cdf",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathInverseNormalCdf",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-26 time: 23:04",
+        "usage": "math_inverse_normal_cdf(...)",
+        "paramDesc": "参数类型: double, double, double",
+        "returnDesc": "返回类型: DoubleWritable",
+        "example": "select math_inverse_normal_cdf(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_is_finite",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathIsFinite",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断x是否为有限数值",
+        "usage": "is_finite(x) -> boolean",
+        "paramDesc": "参数: x",
+        "returnDesc": "返回: boolean",
+        "example": "select math_is_finite(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_is_infinite",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathIsInfinite",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断x是否为无穷数值",
+        "usage": "is_infinite(x) -> boolean",
+        "paramDesc": "参数: x",
+        "returnDesc": "返回: boolean",
+        "example": "select math_is_infinite(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_is_na_n",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathIsNaN",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "判断x是否不是一个数值类型的变量",
+        "usage": "is_nan(x) -> boolean",
+        "paramDesc": "参数: x",
+        "returnDesc": "返回: boolean",
+        "example": "select math_is_na_n(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_na_n",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathNaN",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "获取一个表示NAN（not-a-number）的常数",
+        "usage": "nan() -> double",
+        "paramDesc": "无参数",
+        "returnDesc": "返回: double",
+        "example": "select math_na_n(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_normal_cdf",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathNormalCdf",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-26 time: 23:03",
+        "usage": "math_normal_cdf(...)",
+        "paramDesc": "参数类型: double, double, double",
+        "returnDesc": "返回类型: DoubleWritable",
+        "example": "select math_normal_cdf(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "math_to_base",
+        "className": "com.chinagoods.bigdata.functions.math.UDFMathToBase",
+        "kind": "MATH",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "返回x以radix为基数的字面量",
+        "usage": "to_base(x, radix) -> varchar",
+        "paramDesc": "参数: x, radix",
+        "returnDesc": "返回: varchar",
+        "example": "select math_to_base(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "md5",
+        "className": "com.chinagoods.bigdata.functions.string.UDFMd5",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "md5 哈希",
+        "usage": "md5(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select md5('aaronshan') => 95686bc0483262afe170b550dd4544d1",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "messy_code_recover",
+        "className": "com.chinagoods.bigdata.functions.string.UDFMessyCodeRecover",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song 乱码恢复",
+        "usage": "messy_code_recover(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: Text",
+        "example": "select messy_code_recover(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "new_goods_negative_string",
+        "className": "com.chinagoods.bigdata.functions.risk.negative.UDFNewGoodsNegativeString",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2022-03-23 time: 14:48",
+        "usage": "new_goods_negative_string(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select new_goods_negative_string(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "nginx_log_decode",
+        "className": "com.chinagoods.bigdata.functions.url.UDFNginxLogDecode",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2021-01-04",
+        "usage": "nginx_log_decode(...)",
+        "paramDesc": "参数类型: String",
+        "returnDesc": "返回类型: Text",
+        "example": "select nginx_log_decode(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "parse_authorization",
+        "className": "com.chinagoods.bigdata.functions.parse.UDFParseAuthorization",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2023-09-04 time: 17:53 describe: 解析headers中的authorization，获取user_id, login_name, phone, email, nick_name, client_id, register_time",
+        "usage": "parse_authorization(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select parse_authorization(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "parse_user_agent",
+        "className": "com.chinagoods.bigdata.functions.parse.UDFParseUserAgent",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author zyl date: 2023-07-19 time: 17:53 describe: 解析ua获取device_family、os_family、os_minor、os_major、user_agent_family、user_agent_minor和user_agent_major",
+        "usage": "parse_user_agent(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select parse_user_agent(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "re2_j_regexp_extract",
+        "className": "com.chinagoods.bigdata.functions.regexp.UDFRe2JRegexpExtract",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 22:38",
+        "usage": "re2_j_regexp_extract(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select re2_j_regexp_extract(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "re2_j_regexp_extract_all",
+        "className": "com.chinagoods.bigdata.functions.regexp.UDFRe2JRegexpExtractAll",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 22:38",
+        "usage": "re2_j_regexp_extract_all(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select re2_j_regexp_extract_all(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "re2_j_regexp_like",
+        "className": "com.chinagoods.bigdata.functions.regexp.UDFRe2JRegexpLike",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 22:36",
+        "usage": "re2_j_regexp_like(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: boolean",
+        "example": "select re2_j_regexp_like(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "re2_j_regexp_replace",
+        "className": "com.chinagoods.bigdata.functions.regexp.UDFRe2JRegexpReplace",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 22:37",
+        "usage": "re2_j_regexp_replace(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select re2_j_regexp_replace(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "re2_j_regexp_split",
+        "className": "com.chinagoods.bigdata.functions.regexp.UDFRe2JRegexpSplit",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 22:38",
+        "usage": "re2_j_regexp_split(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select re2_j_regexp_split(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "rest_name_format",
+        "className": "com.chinagoods.bigdata.functions.string.UDFRestNameFormat",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author zyl date: 2024-07-29 time: 10:30 describe: 获取对应时间设备所属食堂rest_name_format",
+        "usage": "rest_name_format(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: String",
+        "example": "select rest_name_format(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "risk_keywords",
+        "className": "com.chinagoods.bigdata.functions.risk.UDFRiskKeywords",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2022-03-23 time: 14:48",
+        "usage": "risk_keywords(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select risk_keywords(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "search_keywords_sensitive",
+        "className": "com.chinagoods.bigdata.functions.search.UDFSearchKeywordsSensitive",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2022-03-07 time: 14:48",
+        "usage": "search_keywords_sensitive(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select search_keywords_sensitive(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "sequence",
+        "className": "com.chinagoods.bigdata.functions.array.UDFSequence",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "生成日期数组序列.",
+        "usage": "sequence(start_date_string, end_data_string, step) -> array<String>",
+        "paramDesc": "参数: start_date_string, end_data_string, step",
+        "returnDesc": "返回: array<String>",
+        "example": "select sequence('2016-04-12 00:00:00', '2016-04-14 00:00:00', 24*3600*1000) => ['2016-04-12 00:00:00', '2016-04-13 00:00:00', '2016-04-14 00:00:00']",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "sequence_date",
+        "className": "com.chinagoods.bigdata.functions.array.UDFSequenceDate",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author xiaowei.song date: 2021-09-04 上午9:23",
+        "usage": "sequence_date(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: ArrayList<Text>",
+        "example": "select sequence_date(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "session_row_sequence",
+        "className": "com.chinagoods.bigdata.functions.session.UDFSessionRowSequence",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "UDFSessionRowSequence. @author xiaowei.song",
+        "usage": "session_row_sequence(...)",
+        "paramDesc": "参数类型: String, String, String",
+        "returnDesc": "返回类型: Long",
+        "example": "select session_row_sequence(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "sha256",
+        "className": "com.chinagoods.bigdata.functions.string.UDFSha256",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "sha256 哈希",
+        "usage": "sha256(string) -> string",
+        "paramDesc": "参数: string",
+        "returnDesc": "返回: string",
+        "example": "select sha256('aaronshan') => d16bb375433ad383169f911afdf45e209eabfcf047ba1faebdd8f6a0b39e0a32",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "sort_key_by_value",
+        "className": "com.chinagoods.bigdata.functions.array.UDAFSortKeyByValue",
+        "kind": "AGGREGATE",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author assistant date: 2025-07-25 time: 12:00",
+        "usage": "sort_key_by_value(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回值详见源码",
+        "example": "select sort_key_by_value(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "sort_value_by_date",
+        "className": "com.chinagoods.bigdata.functions.array.UDAFSortValueByDate",
+        "kind": "AGGREGATE",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author auto-generated based on UDAFSortKeyByValue date: 2025-10-13 time: 16:42",
+        "usage": "sort_value_by_date(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回值详见源码",
+        "example": "select sort_value_by_date(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "standard_url_format",
+        "className": "com.chinagoods.bigdata.functions.url.UDFStandardUrlFormat",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "The normalized url returns the standard url and the 3-level category name",
+        "usage": "standard_url_format(string,string) -> array(varchar)",
+        "paramDesc": "参数: string,string",
+        "returnDesc": "返回: array(varchar)",
+        "example": "select standard_url_format('wap','https://m.chinagoods.com/en/venue?id=14&dsds=d') => [\"https://m.chinagoods.com/en/venue/?id=14\",\"营销会场\",\"营销会场\",\"测试-领券中心\"]",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_hamming_distance",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringHammingDistance",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-26 time: 23:43",
+        "usage": "string_hamming_distance(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: LongWritable",
+        "example": "select string_hamming_distance(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_levenshtein_distance",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringLevenshteinDistance",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-26 time: 23:53",
+        "usage": "string_levenshtein_distance(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: LongWritable",
+        "example": "select string_levenshtein_distance(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_normalize",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringNormalize",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 下午12:37",
+        "usage": "string_normalize(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select string_normalize(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_position",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringPosition",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 下午12:08",
+        "usage": "string_position(...)",
+        "paramDesc": "参数类型: Text, Text",
+        "returnDesc": "返回类型: LongWritable",
+        "example": "select string_position(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_split_to_map",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringSplitToMap",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 00:04",
+        "usage": "string_split_to_map(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select string_split_to_map(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "string_split_to_multimap",
+        "className": "com.chinagoods.bigdata.functions.string.UDFStringSplitToMultimap",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "@author ruifeng.shan date: 2018-07-27 time: 00:04",
+        "usage": "string_split_to_multimap(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select string_split_to_multimap(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "to_json",
+        "className": "com.chinagoods.bigdata.functions.json.UDFToJson",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "To Json 函数",
+        "usage": "to_json(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select to_json(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "type_of_day",
+        "className": "com.chinagoods.bigdata.functions.date.UDFTypeOfDay",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "获取日期的类型(1: 法定节假日, 2: 正常周末, 3: 正常工作日 4:攒假的工作日),错误返回-1.",
+        "usage": "type_of_day(date_string \\| date) -> string",
+        "paramDesc": "参数: date_string \\| date",
+        "returnDesc": "返回: string",
+        "example": "select type_of_day('2016-09-18') => 4",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "unicode2_chinese",
+        "className": "com.chinagoods.bigdata.functions.string.UDFUnicode2Chinese",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "将包含 Unicode 转义(例如 U+XXXX 或以反斜杠和字母 u 开头的4位十六进制编码)的字符串内容转换为对应的中文内容。 如果输入本身已是中文或不包含转义，则原样返回。  Example: > select unicode2chinese('[{\"MsgContent\": {\"Text\": \"\\u8001\\u677f\\u4f60\\u597d\\uff0c\\u6211\\u60f3\\u8981\\u8be6\\u7ec6\\u4e86\\u89e3\\u4e0b\\u5e97\\u94fa\\u4fe1\\u606f~\"}, \"MsgType\": \"TIMTextElem\"}]'); -> [{\"MsgContent\": {\"Text\": \"老板你好，我想要详细了解下店铺信息~\"}, \"MsgType\": \"TIMTextElem\"}]  @author auto-generated based on UDFUnicodeToChinese",
+        "usage": "unicode2_chinese(...)",
+        "paramDesc": "参数详见源码",
+        "returnDesc": "返回类型: Object",
+        "example": "select unicode2_chinese(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "unicode_to_chinese",
+        "className": "com.chinagoods.bigdata.functions.string.UDFUnicodeToChinese",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "将包含 Unicode 转义(例如 U+XXXX 或以反斜杠和字母 u 开头的4位十六进制编码)的字符串内容转换为对应的中文（或其它原字符）。 如果输入本身已是中文或不包含转义，则原样返回。  Example: > select unicode_to_chinese('[{\"MsgContent\": {\"Text\": \"\\\\u8001\\\\u677f\\\\u4f60\\\\u597d\\\\uff0c\\\\u6211\\\\u60f3\\\\u8981\\\\u8be6\\\\u7ec6\\\\u4e86\\\\u89e3\\\\u4e0b\\\\u5e97\\\\u94fa\\\\u4fe1\\\\u606f~\"}, \"MsgType\": \"TIMTextElem\"}]'); ->  [{\"MsgContent\": {\"Text\": \"老板你好，我想要详细了解下店铺信息~\"}, \"MsgType\": \"TIMTextElem\"}]",
+        "usage": "unicode_to_chinese(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select unicode_to_chinese(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "url_decode",
+        "className": "com.chinagoods.bigdata.functions.url.UDFUrlDecode",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "unescape the URL encoded value. This function is the inverse of `url_encode`.",
+        "usage": "url_decode(value) -> string",
+        "paramDesc": "参数: value",
+        "returnDesc": "返回: string",
+        "example": "select url_decode(...) from table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "url_encode",
+        "className": "com.chinagoods.bigdata.functions.url.UDFUrlEncode",
+        "kind": "STRING",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "escapes value by encoding it so that it can be safely included in URL query parameter names and values",
+        "usage": "url_encode(value) -> string",
+        "paramDesc": "参数: value",
+        "returnDesc": "返回: string",
+        "example": "select url_encode('http://shanruifeng.cc/') => http%3A%2F%2Fshanruifeng.cc%2F",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "whisper",
+        "className": "com.chinagoods.bigdata.functions.audio.UDFWhisper",
+        "kind": "OTHER",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "Created by xiaowei.song on 20/4/23.",
+        "usage": "whisper(...)",
+        "paramDesc": "参数类型: Text",
+        "returnDesc": "返回类型: Text",
+        "example": "select whisper(...) from your_table",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "zodiac_sign_cn",
+        "className": "com.chinagoods.bigdata.functions.date.UDFZodiacSignCn",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "将日期转换为星座中文",
+        "usage": "zodiac_cn(date_string \\| date) -> string",
+        "paramDesc": "参数: date_string \\| date",
+        "returnDesc": "返回: string",
+        "example": "select zodiac_cn('1989-01-08') => 魔羯座",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    },
+    {
+        "name": "zodiac_sign_en",
+        "className": "com.chinagoods.bigdata.functions.date.UDFZodiacSignEn",
+        "kind": "DATE_AND_TIME",
+        "resourceFile": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+        "type": "DLC",
+        "description": "将日期转换为星座英文",
+        "usage": "zodiac_en(date_string \\| date) -> string",
+        "paramDesc": "参数: date_string \\| date",
+        "returnDesc": "返回: string",
+        "example": "select zodiac_en('1989-01-08') => Capricorn",
+        "resourceList": [
+            {
+                "Path": "cosn://bigdata-1301563501/udf/hive-third-functions-2.2.7-shaded.jar",
+                "Name": "hive-third-functions-2.2.7-shaded.jar",
+                "Type": "cos_url"
+            }
+        ]
+    }
+]
